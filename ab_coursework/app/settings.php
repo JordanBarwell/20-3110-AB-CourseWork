@@ -32,36 +32,49 @@ define('LANDING_PAGE', $urlRoot);
 //define ('LIB_CHART_FILE_PATH', $scriptPath);
 //define ('LIB_CHART_CLASS_PATH', 'libchart/classes/');
 
-$wsdl = 'https://m2mconnect.ee.co.uk/orange-soap/services/MessageServiceByCountry?wsdl';
-define('WSDL', $wsdl);
-
 $settings = [
     'settings' => [
         'displayErrorDetails' => true,
         'addContentLengthHeader' => false,
         'debug' => true,
         'classPath' => __DIR__ . '/src/',
+        'naKey' => 'Jared & Jordan & Charlie Web App',
         'view' => [
             'templatePath' => __DIR__ . '/templates/',
             'twig' => [
                 'cache' => false,
                 'auto_reload' => true,
                 'debug' => true
-            ]],
-        'pdo_settings' => [
-            'rdbms' => 'mysql',
+            ]
+        ],
+        'doctrine' => [
+            'driver' => 'pdo_mysql',
             'host' => 'localhost',
             'dbName' => 'abcoursework_db',
             'port' => '3306',
-            'userName' => 'abcoursework_user',
-            'userPassword' => 'abcoursework_pass',
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'options' => [
+            'user' => 'abcoursework_user',
+            'password' => 'abcoursework_pass',
+            'charset' => 'utf8mb4',
+            'driverOptions' => [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => true
             ]
+        ],
+        'soap' => [
+            'connection' => [
+                'wsdl' => 'https://m2mconnect.ee.co.uk/orange-soap/services/MessageServiceByCountry?wsdl',
+                'options' => [
+                    'trace' => true,
+                    'exceptions' => true
+                ]
+            ],
+            'login' => [
+                'username' => '',
+                'password' => ''
+            ]
+        ],
+        'bcrypt' => [
+            'cost' => 14
         ]
     ]
 ];
