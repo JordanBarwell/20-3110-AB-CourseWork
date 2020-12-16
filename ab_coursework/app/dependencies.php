@@ -10,12 +10,12 @@
  */
 
 $container['view'] = function ($container) {
-  $view = new Slim\Views\Twig(
+  $view = new \Slim\Views\Twig(
     $container['settings']['view']['templatePath'],
     $container['settings']['view']['twig']
   );
 
-  // Add Twig Extension
+  // Instantiate and add Slim specific extension
   $basePath = rtrim(str_ireplace('index.php', '', $container['request']->getUri()->getBasePath()), '/');
   $view->addExtension(new Slim\Views\TwigExtension($container['router'], $basePath));
   $view->addExtension(new Twig\Extension\DebugExtension());
@@ -23,43 +23,16 @@ $container['view'] = function ($container) {
   return $view;
 };
 
-$container['Logger'] = function ($container) {
-    $logger = new Monolog\Logger('logger');
-    $logFile = '../../logs/ABCoursework.log';
+$container['loggerWrapper'] = function ($container) {
+    $loggingWrapper = new Monolog\Logger('logger');
+    $logsFilePath = '../../../logs/';
+    $logsFileName = 'abCoursework.log';
+    $logFile = $logsFilePath . $logsFileName;
+    $loggingWrapper->pushHandler(new \Monolog\Handler\StreamHandler($logFile, \Monolog\Logger::DEBUG));
 
-    // Create Log Formatting
-    $fileHandler = new Monolog\Handler\StreamHandler($logFile, \Monolog\Logger::DEBUG);
-    $dateFormat = 'd/M/Y H:i:s';
-    $output = "%datetime% | %level_name% | %message% | %context% | %extra%\n";
-    $formatter = new Monolog\Formatter\LineFormatter($output, $dateFormat, false, true);
-    $fileHandler->setFormatter($formatter);
-
-    $logger->pushHandler($fileHandler);
-
-    return $logger;
+    return $loggingWrapper;
 };
 
-$container['SoapWrapper'] = function ($container) {
-    return new ABCoursework\SoapWrapper($container['Logger'], $container['settings']['soap']['connection']);
-};
-
-$container['Base64Wrapper'] = function ($container) {
-    return new ABCoursework\Base64Wrapper();
-};
-
-$container['BcryptWrapper'] = function ($container) {
-    return new ABCoursework\BcryptWrapper($container['settings']['bcrypt']);
-};
-
-$container['LibSodiumWrapper'] = function ($container) {
-    return new ABCoursework\LibSodiumWrapper($container['settings']['naKey'], $container['Base64Wrapper']);
-};
-
-$container['QueryBuilder'] = function ($container) {
-    $connection = \Doctrine\DBAL\DriverManager::getConnection($container['settings']['doctrine']);
-    return $connection->createQueryBuilder();
-};
-
-$container['SqlQueries'] = function ($container) {
-    return new ABCoursework\SqlQueries($container['QueryBuilder'], $container['Logger']);
+$container['sqlQueries'] = function ($container) {
+  return new \ABCoursework\SQLQueries();
 };

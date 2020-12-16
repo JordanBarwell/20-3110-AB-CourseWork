@@ -11,3 +11,4 @@
  */
 
 require 'routes/homepage.php';
+require 'routes/registration.php';
