@@ -1,27 +1,25 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <h2>{{ page_heading_2 }}</h2>
-    <p>{{ page_text }}</p>
-    <fieldset>
-        <legend>Please Enter Details</legend>
-        <label for="SiteUsername">Enter Site Username:</label>
-        <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="30">
-        <br><br>
-        <label for="SitePassword">Enter Site Password:</label>
-        <input id="SitePassword" name="SitePassword" type="text" value="" size="20" maxlength="30">
-        <br><br>
-        <label for="EEUsername">Enter EE Username:</label>
-        <input id="EEUsername" name="EEUsername" type="text" value="" size="20" maxlength="30">
-        <br><br>
-        <label for="EEPassword">Enter EE Password:</label>
-        <input id="EEPassword" name="EEPassword" type="text" value="" size="20" maxlength="30">
-        <br><br>
-        <label for="PhoneNumber">Enter Phone Number:</label>
-        <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="20" maxlength="30">
-        <br><br>
-        <input type="submit" value="Submit Details">
-        <input type="reset" value="clear fields">
-        <br><br>
-        <a href="{{ path_for('homepage') }}">Home</a>
-    </fieldset>
+    <form>
+        <h2>{{ page_heading_2 }}</h2>
+        <p>{{ page_text }}</p>
+        <fieldset>
+            <label for="SiteUsername">Enter New Username:</label>
+            <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="30">
+            <br><br>
+            <label for="SitePassword">Enter New Password:</label>
+            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="30">
+            <br><br>
+            <label for="ConfirmPassword">Confirm New Password:</label>
+            <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" value="" size="20" maxlength="30">
+            <br><br>
+            <label for="PhoneNumber">Enter New Phone Number:</label>
+            <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="13" maxlength="13">
+            <br><br>
+            <input type="submit" value="Submit Details">
+            <input type="reset" value="clear fields">
+            <br><br>
+            <a href="{{ path_for('homepage') }}">Home</a>
+        </fieldset>
+    </form>
 {% endblock %}

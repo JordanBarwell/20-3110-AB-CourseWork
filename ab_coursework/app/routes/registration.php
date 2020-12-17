@@ -11,9 +11,10 @@ $app->get('/registration', function (Request $request, Response $response) use (
             'css_path' => CSS_PATH,
             'landing_page' => LANDING_PAGE,
             'page_title' => APP_NAME,
+            'additional_info' => 'Created by Jared, Charlie and Jordan',
             'page_heading_1' => 'Team AB Coursework',
             'page_heading_2' => 'Registration Form',
-            'page_text' => 'Please Input Information'
+            'page_text' => 'Please Create Your New User Info'
         ]);
 
 })->setName('registration');
