@@ -12,3 +12,4 @@
 
 require 'routes/homepage.php';
 require 'routes/registration.php';
+require 'routes/login.php';
