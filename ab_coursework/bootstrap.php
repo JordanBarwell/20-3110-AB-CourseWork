@@ -8,6 +8,8 @@
  * Date: 28/11/2020
  *
  */
+use \Slim\{Container, App};
+use \ABCoursework\{SessionManagerInterface, SessionWrapperInterface};
 
 require 'vendor/autoload.php';
 
@@ -20,13 +22,16 @@ if ($makeTrace && function_exists('xdebug_start_trace'))
   xdebug_start_trace();
 }
 
-$container = new \Slim\Container($settings);
+$container = new Container($settings);
 
 require __DIR__ . '/app/dependencies.php';
 
-$app = new \Slim\App($container);
+$app = new App($container);
 
 require __DIR__ . '/app/routes.php';
+
+//Starts Session
+$container->get(SessionManagerInterface::class)::start($container->get(SessionWrapperInterface::class));
 
 $app->run();
 

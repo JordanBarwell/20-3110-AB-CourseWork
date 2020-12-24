@@ -23,7 +23,7 @@ $container['view'] = function ($container) {
   return $view;
 };
 
-$container['Logger'] = function ($container) {
+$container[\Psr\Log\LoggerInterface::class] = function ($container) {
     $logger = new Monolog\Logger('logger');
     $logFile = '../../logs/ABCoursework.log';
 
@@ -40,7 +40,7 @@ $container['Logger'] = function ($container) {
 };
 
 $container['SoapWrapper'] = function ($container) {
-    return new ABCoursework\SoapWrapper($container['Logger'], $container['settings']['soap']['connection']);
+    return new ABCoursework\SoapWrapper($container[\Psr\Log\LoggerInterface::class], $container['settings']['soap']['connection']);
 };
 
 $container['Base64Wrapper'] = function ($container) {
@@ -55,11 +55,27 @@ $container['LibSodiumWrapper'] = function ($container) {
     return new ABCoursework\LibSodiumWrapper($container['settings']['naKey'], $container['Base64Wrapper']);
 };
 
+$container['XmlParser'] = function ($container) {
+    return new ABCoursework\XmlParser();
+};
+
+$container[\ABCoursework\SessionWrapperInterface::class] = function ($container) {
+    return new \ABCoursework\FileSessionWrapper($container['LibSodiumWrapper']);
+};
+
+$container[\ABCoursework\SessionManagerInterface::class] = function ($container) {
+    return new \ABCoursework\SessionManager();
+};
+
+$container['Validator'] = function ($container) {
+    return new ABCoursework\Validator();
+};
+
 $container['QueryBuilder'] = function ($container) {
     $connection = \Doctrine\DBAL\DriverManager::getConnection($container['settings']['doctrine']);
     return $connection->createQueryBuilder();
 };
 
 $container['SqlQueries'] = function ($container) {
-    return new ABCoursework\SqlQueries($container['QueryBuilder'], $container['Logger']);
+    return new ABCoursework\SqlQueries($container[\Psr\Log\LoggerInterface::class], $container['QueryBuilder']);
 };

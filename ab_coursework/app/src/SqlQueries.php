@@ -14,28 +14,28 @@ use Psr\Log\LoggerInterface;
 class SqlQueries
 {
     /**
-     * @var QueryBuilder Doctrine query builder with connection to database.
-     */
-    private QueryBuilder $queryBuilder;
-
-    /**
      * @var LoggerInterface Logger used to log database queries.
      */
     private LoggerInterface $logger;
+
+    /**
+     * @var QueryBuilder Doctrine query builder with connection to database.
+     */
+    private QueryBuilder $queryBuilder;
 
     /**
      * Creates a new instance of SqlQueries with the given QueryBuilder and Logger.
      * @param QueryBuilder $queryBuilder Query Builder for building SQL queries.
      * @param LoggerInterface $logger Logger for logging queries.
      */
-    public function __construct(QueryBuilder $queryBuilder, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, QueryBuilder $queryBuilder)
     {
-        $this->queryBuilder = $queryBuilder;
         $this->logger = $logger;
+        $this->queryBuilder = $queryBuilder;
     }
 
     /**
-     * Sets new QueryBuilder for all future queries of this instace.
+     * Sets new QueryBuilder for all future queries of this instance.
      * @param QueryBuilder $queryBuilder New QueryBuilder.
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder)

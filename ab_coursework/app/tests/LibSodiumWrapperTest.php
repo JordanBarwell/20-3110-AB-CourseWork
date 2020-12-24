@@ -3,22 +3,45 @@
 use ABCoursework\LibSodiumWrapper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * LibSodiumWrapperTest: LibSodium Wrapper Tests.
+ *
+ * @author Team AB (Jared)
+ */
 class LibSodiumWrapperTest extends TestCase
 {
+    /**
+     * @var string Web App's encryption key.
+     */
     static string $key;
+
+    /**
+     * @var string Test data to be encrypted/decrypted.
+     */
     static string $testData;
 
+    /**
+     * Runs before all tests, initialising all necessary dependencies and retrieving settings values if needed.
+     */
     public static function setUpBeforeClass(): void
     {
         self::$key = (@require 'settings.php')['settings']['naKey'];
         self::$testData = 'Testing Testing 123';
     }
 
+    /**
+     * Runs after the class' tests have finished, overwriting the key data so it can't be retrieved from memory.
+     */
     public static function tearDownAfterClass(): void
     {
         sodium_memzero(self::$key);
     }
 
+    /**
+     * Tests the constructor works correctly with the correct key length and a Base64Wrapper.
+     * @return LibSodiumWrapper Wrapper to be used in all tests.
+     * @throws Exception If key is too short.
+     */
     public function testConstructor()
     {
         $wrapper = new LibSodiumWrapper(self::$key, new \ABCoursework\Base64Wrapper());
@@ -27,8 +50,8 @@ class LibSodiumWrapperTest extends TestCase
     }
 
     /**
-     *
-     * @throws Exception
+     * Tests that an exception is thrown if the key is too short in the constructor.
+     * @throws Exception If key is too short.
      * @depends testConstructor
      */
     public function testConstructorException()
@@ -38,7 +61,7 @@ class LibSodiumWrapperTest extends TestCase
     }
 
     /**
-     *
+     * Tests that the length of the wrapper encrypted string is the same as the library encrypted string.
      * @depends testConstructor
      */
     public function testEncryption(LibSodiumWrapper $wrapper)
@@ -55,7 +78,7 @@ class LibSodiumWrapperTest extends TestCase
     }
 
     /**
-     *
+     * Tests that the encryption function returns false if an empty value is entered.
      * @depends testConstructor
      * @depends testEncryption
      */
@@ -65,7 +88,7 @@ class LibSodiumWrapperTest extends TestCase
     }
 
     /**
-     *
+     * Tests that the decryption function returns the original value when an encrypted value is passed to it.
      * @depends testConstructor
      * @depends testEncryption
      */
@@ -76,7 +99,7 @@ class LibSodiumWrapperTest extends TestCase
     }
 
     /**
-     *
+     * Tests that the decryption function returns false if an empty value is entered.
      * @depends testConstructor
      * @depends testDecryption
      */
