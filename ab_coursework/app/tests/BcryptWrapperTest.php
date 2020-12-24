@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * BcryptWrapperTest: BCrypt Wrapper Tests.
  *
+ * @author Team AB (Jared)
  */
 class BcryptWrapperTest extends TestCase
 {

@@ -3,13 +3,29 @@
 namespace ABCoursework;
 
 /**
- * SessionWrapperInterface: Interface for session functions.
+ * SessionWrapperInterface: Defines session value CRUD functions, for manipulating $_SESSION and adding in extra
+ * implementations such as encrypting/encoding.
  *
  * @package ABCoursework
  * @author Team AB (Jared)
  */
 interface SessionWrapperInterface
 {
+
+    /**
+     * Checks if a session value has been set with the given identifying key.
+     * @param string $key The session value's key.
+     * @return bool Whether a value with that key exists in storage.
+     */
+    public function check(string $key): bool;
+
+    /**
+     * Returns a session value from storage, using its identifying key.
+     * @param string $key The session value's key.
+     * @return false|mixed Either the session value or false if the value doesn't exist or couldn't be retrieved.
+     */
+    public function get(string $key);
+
     /**
      * Sets a session value in storage, identified by the key provided.
      * @param string $key The session value's identifying key.
@@ -25,23 +41,4 @@ interface SessionWrapperInterface
      */
     public function remove(string $key): bool;
 
-    /**
-     * Returns a session value from storage, using its identifying key.
-     * @param string $key The session value's key.
-     * @return false|mixed Either the session value or false if the value doesn't exist.
-     */
-    public function get(string $key);
-
-    /**
-     * Checks if a session value has been set with the given identifying key.
-     * @param string $key The session value's key.
-     * @return bool Whether the value exists in storage.
-     */
-    public function check(string $key): bool;
-
-    /**
-     * Set Wrapper's Logger to a new logger instance.
-     * @param \Psr\Log\LoggerInterface $logger Logger to be used in the wrapper.
-     */
-    public function setLogger(\Psr\Log\LoggerInterface $logger);
 }

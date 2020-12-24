@@ -6,7 +6,6 @@
  *
  * Author: Team AB
  * Date: 28/11/2020
- *
  */
 
 ini_set('display_errors', 'On');
