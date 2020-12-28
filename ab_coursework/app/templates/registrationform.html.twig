@@ -1,19 +1,22 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form>
+    <form action="{{action}}" method="{{method}}">
         <h2>{{ page_heading_2 }}</h2>
         <p>{{ page_text }}</p>
         <fieldset>
-            <label for="SiteUsername">Enter New Username:</label>
+            <label for="UserEmail">Enter Email Address:<small>{{ userEmail_error }}</small></label>
+            <input id="UserEmail" name="UserEmail" type="text" value="" size="20" maxlength="30">
+            <br><br>
+            <label for="SiteUsername">Enter New Username:<small>{{ username_error }}</small></label>
             <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="30">
             <br><br>
-            <label for="SitePassword">Enter New Password:</label>
-            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="30">
+            <label for="SitePassword">Enter New Password:<small>{{ password_error }}</small></label>
+            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
             <br><br>
-            <label for="ConfirmPassword">Confirm New Password:</label>
-            <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" value="" size="20" maxlength="30">
+            <label for="ConfirmPassword">Confirm New Password:<small>{{ confirmPassword_error }}</small></label>
+            <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
             <br><br>
-            <label for="PhoneNumber">Enter New Phone Number:</label>
+            <label for="PhoneNumber">Enter New Phone Number:<small>{{ phoneNumber_error }}</small></label>
             <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="13" maxlength="13">
             <br><br>
             <input type="submit" value="Submit Details">
