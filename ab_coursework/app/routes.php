@@ -13,3 +13,5 @@
 require 'routes/homepage.php';
 require 'routes/registration.php';
 require 'routes/login.php';
+require 'routes/registrationsubmit.php';
+require 'routes/menu.php';
