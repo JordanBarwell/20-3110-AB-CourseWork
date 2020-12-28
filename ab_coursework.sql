@@ -1,6 +1,6 @@
 DROP DATABASE IF EXISTS 'abcoursework_db';
 
-CREATE DATABASE 'abcoursework_db' COLLATE utf8_unicode_ci;
+CREATE DATABASE abcoursework_db COLLATE utf8_unicode_ci;
 
 CREATE USER IF NOT EXISTS 'abcoursework_user'@'localhost' IDENTIFIED BY 'abcoursework_pass';
 GRANT SELECT,INSERT ON abcoursework_db.* TO 'abcoursework_user'@localhost;
