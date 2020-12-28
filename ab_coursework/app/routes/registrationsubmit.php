@@ -54,7 +54,7 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
     }
 
     if($validator->areAllValid() && empty($confirmedPasswordError) && empty($passwordError)){
-        $response = $response->withStatus(200);
+        $response = $response->withStatus(303);
        return $response->withHeader('Location', 'menu');
     }
 
