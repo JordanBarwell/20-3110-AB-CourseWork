@@ -52,6 +52,20 @@ class SqlQueries
         $this->logger = $logger;
     }
 
+    public function getAllUsers()
+    {
+        $queryString = "SELECT * username ";
+        $queryString .= "FROM users ";
+        $queryString .= "ORDER BY username;";
+        return $queryString;
+    }
 
+    public function getUsernamePassword()
+    {
+        $queryString = "SELECT username, password ";
+        $queryString .= "FROM users ";
+        $queryString .= "WHERE username = password; ";
+        return $queryString;
+    }
 
 }
