@@ -7,55 +7,74 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
 
     $validator = $this->get('Validator');
 
-    $userInput = $request->getParsedBody();
-    $userEmail = $userInput['UserEmail'] ?? '';
-    $username = $userInput['SiteUsername'] ?? '';
-    $password = $userInput['SitePassword'] ?? '';
-    $confirmedPassword = $userInput['ConfirmPassword'] ?? '';
-    $phoneNumber = $userInput['PhoneNumber'] ?? '';
-
-    $passwordValidated = '';
-    $passwordError = '';
-
-    if (empty($password)) {
-        $passwordError = 'please enter a password';
-    } elseif (strlen($password) > 100) {
-        $passwordError = 'password must be less than or equal to 100 characters';
-    } else {
-        $passwordValidated = $password;
-    }
-
-    $confirmedPasswordValidated = '';
-    $confirmPasswordError = '';
-
-    if (empty($confirmedPassword)) {
-        $confirmPasswordError = 'password must be confirmed';
-    } elseif ($confirmedPassword !== $password) {
-        $confirmPasswordError = 'password does not match';
-    } else{
-        $confirmedPasswordValidated = $confirmedPassword;
-    }
-
-    $validateEmail = $validator->validateEmail('UserEmail', $userEmail);
-    $validatedUsername = $validator->validateString('SiteUsername', $username);
-    $validatedPassword = $passwordValidated;
-    $validateConfirmPassword = $confirmedPasswordValidated;
-    $validatePhoneNumber = $validator->validatePhoneNumber('PhoneNumber', $phoneNumber);
+    $taintedParameters = $request->getParsedBody();
+    $cleanedParameters = cleanupParameters($app, $taintedParameters);
 
     $userEmailError = '';
     $usernameError = '';
     $phoneNumberError = '';
+    $passwordError = '';
+    $confirmPasswordError = '';
+    $existingUsernameError = '';
+    $existingEmailError = '';
+    $existingPhoneError = '';
 
-    if(!$validator->areAllValid()){
+    $passwordValidated = '';
+
+    if (empty($cleanedParameters['cleanedSitePassword'])) {
+        $passwordError = 'This field is required!';
+    } elseif (strlen($cleanedParameters['cleanedSitePassword']) > 100) {
+        $passwordError = 'password must be less than or equal to 100 characters';
+    } else {
+        $passwordValidated = $cleanedParameters['cleanedSitePassword'];
+    }
+
+    $confirmedPasswordValidated = '';
+
+    if (empty($cleanedParameters['cleanedConfirmPassword'])) {
+        $confirmPasswordError = 'This field is required!';
+    } elseif ($cleanedParameters['cleanedConfirmPassword'] !== $cleanedParameters['cleanedSitePassword']) {
+        $confirmPasswordError = 'password does not match';
+    } else {
+        $confirmedPasswordValidated = $cleanedParameters['cleanedConfirmPassword'];
+    }
+
+    $validatedPassword = $passwordValidated;
+    $validatedConfirmPassword = $confirmedPasswordValidated;
+
+    if ($cleanedParameters['cleanedConfirmPassword'] === $cleanedParameters['cleanedSitePassword']) {
+        $hashedPassword = hashPassword($app, $cleanedParameters['cleanedSitePassword']);
+    }
+
+    if (!$validator->areAllValid()) {
         $validatorError = $validator->getErrors();
         $userEmailError = $validatorError['UserEmail'] ?? '';
         $usernameError = $validatorError['SiteUsername'] ?? '';
         $phoneNumberError = $validatorError['PhoneNumber'] ?? '';
     }
 
-    if($validator->areAllValid() && empty($confirmedPasswordError) && empty($passwordError)){
-        $response = $response->withStatus(303);
-       return $response->withHeader('Location', 'menu');
+    if ($validator->areAllValid() && empty($confirmPasswordError) && empty($passwordError)) {
+
+        $cleanedParameters['cleanedPhoneNumber'] = (int)substr($cleanedParameters['cleanedPhoneNumber'], 1);
+
+        $data = $this->get('SqlQueries');
+
+        $dataExist = $data->checkUserDetailsExist($cleanedParameters);
+        if($dataExist['username'] === $cleanedParameters['cleanedSiteUsername']){
+            $existingUsernameError = 'Username Already Exists';
+        }
+        if($dataExist['email'] === $cleanedParameters['cleanedUserEmail']){
+            $existingEmailError = 'Email Already In Use';
+        }
+        if((int)$dataExist['phone'] === $cleanedParameters['cleanedPhoneNumber']){
+            $existingPhoneError = 'Phone Number Already In Use';
+        }
+
+        if(empty($existingUsernameError) && empty($existingEmailError) && empty($existingPhoneError)){
+            $dataStored = $data->storeUserData($cleanedParameters, $hashedPassword);
+            $response = $response->withStatus(303);
+            return $response->withHeader('Location', 'menu');
+        }
     }
 
     return $this->view->render($response,
@@ -74,7 +93,40 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
             'confirmPassword_error' => $confirmPasswordError,
             'userEmail_error' => $userEmailError,
             'username_error' => $usernameError,
-            'phoneNumber_error' => $phoneNumberError
+            'phoneNumber_error' => $phoneNumberError,
+            'existingEmailError' => $existingEmailError,
+            'existingUsernameError' => $existingUsernameError,
+            'existingPhoneError' => $existingPhoneError
         ]);
 
 })->setName('registered');
+
+function cleanupParameters($app, $taintedParameters)
+{
+    $cleanedParameters = [];
+    $validator = $app->getContainer()->get('Validator');
+
+    $taintedEmail = $taintedParameters['UserEmail'];
+    $taintedUsername = $taintedParameters['SiteUsername'];
+    $taintedPassword = $taintedParameters['SitePassword'];
+    $taintedConfirmedPassword = $taintedParameters['ConfirmPassword'];
+    $taintedPhoneNumber = $taintedParameters['PhoneNumber'];
+
+    $cleanedParameters['cleanedUserEmail'] = $validator->validateEmail('UserEmail',$taintedEmail);
+    $cleanedParameters['cleanedSiteUsername'] = $validator->ValidateString('SiteUsername', $taintedUsername);
+    $cleanedParameters['cleanedSitePassword'] = $taintedParameters['SitePassword'];
+    $cleanedParameters['cleanedConfirmPassword'] = $taintedParameters['ConfirmPassword'];
+    $cleanedParameters['cleanedPhoneNumber'] = $validator->validatePhoneNumber('PhoneNumber', $taintedPhoneNumber);
+
+    return $cleanedParameters;
+}
+
+function hashPassword($app, $passwordForHashing): String
+{
+    $bcryptWrapper = $app->getContainer()->get('BcryptWrapper');
+    $hashedPassword = $bcryptWrapper->hash($passwordForHashing);
+    return $hashedPassword;
+}
+
+
+

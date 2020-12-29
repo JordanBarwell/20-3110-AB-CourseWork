@@ -13,7 +13,7 @@ CREATE TABLE `users` (
 	`username` VARCHAR(256) NOT NULL,
 	`password` VARCHAR(256) NOT NULL,
 	`email` VARCHAR(300) NOT NULL,
-	`phone` INT(15) NOT NULL,
+	`phone` BIGINT(15) NOT NULL,
 	PRIMARY KEY (`id`),
 	CONSTRAINT UC_User UNIQUE (`username`, `email`, `phone`)
 ) ENGINE=InnoDB;

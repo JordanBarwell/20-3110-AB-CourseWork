@@ -52,20 +52,53 @@ class SqlQueries
         $this->logger = $logger;
     }
 
-    public function getAllUsers()
+    public function storeUserData(array $cleanedParameters, string $hashedPassword)
     {
-        $queryString = "SELECT * username ";
-        $queryString .= "FROM users ";
-        $queryString .= "ORDER BY username;";
-        return $queryString;
+        $storeResult = [];
+        $username = $cleanedParameters['cleanedSiteUsername'];
+        $email = $cleanedParameters['cleanedUserEmail'];
+        $phoneNumber = ($cleanedParameters['cleanedPhoneNumber']);
+
+        $queryBuilder = $this->queryBuilder->insert('users')
+            ->values([
+                'username' => ':username',
+                'password' => ':password',
+                'email' => ':email',
+                'phone' => ':phone'
+            ])->setParameters([
+                ':username' => $username,
+                ':password' => $hashedPassword,
+                ':email' => $email,
+                ':phone' => $phoneNumber
+            ]);
+
+        $storeResult = $queryBuilder->execute();
+
+        return $storeResult;
     }
 
-    public function getUsernamePassword()
+    public function checkUserDetailsExist($parameters)
     {
-        $queryString = "SELECT username, password ";
-        $queryString .= "FROM users ";
-        $queryString .= "WHERE username = password; ";
-        return $queryString;
+        $result = '';
+        $username = $parameters['cleanedSiteUsername'];
+        $email = $parameters['cleanedUserEmail'];
+        $phoneNumber = $parameters['cleanedPhoneNumber'];
+
+        $queryBuilder = $this->queryBuilder->select('username', 'email', 'phone')
+            ->from('users')
+            ->where(
+                'username = :username ')
+            ->orWhere('email = :email')
+            ->orWhere('phone = :phone')
+            ->setParameters([
+                ':username' => $username,
+                ':email' => $email,
+                ':phone' => $phoneNumber
+            ]);
+
+        $result = $queryBuilder->execute()->fetchAssociative();
+        return $result;
+
     }
 
 }
