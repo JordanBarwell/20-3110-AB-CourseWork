@@ -1,20 +1,22 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form>
+    <form action="{{action}}" method="{{method}}">
         <h2>{{ page_heading_2 }}</h2>
         <p>{{ page_text }}</p>
         <fieldset>
-            <label for="Username">Enter Username:</label>
-            <input id="Username" name="Username" type="text" value="" size="20" maxlength="30">
+            <label for="SiteUsername">Enter Username:<small>{{ usernameError }}</small></label>
+            <br>
+            <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="100">
             <br><br>
-            <label for="Password">Enter Password:</label>
-            <input id="Password" name="Password" type="password" autocomplete="off" value="" size="20" maxlength="30">
+            <label for="SitePassword">Enter Password:<small>{{ passwordError }}</small></label>
+            <br>
+            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
             <br><br>
             <input type="submit" value="Submit Details">
             <input type="reset" value="Clear Fields">
             <br><br>
             <a href="{{ path_for('homepage') }}">Home</a>
-            <p>Already have an account?</p>
+            <p>I don't have a login</p>
             <a href={{ path_for('registration')  }}>Register</a>
         </fieldset>
     </form>
