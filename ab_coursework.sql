@@ -13,15 +13,15 @@ CREATE TABLE `users` (
 	`username` VARCHAR(256) NOT NULL,
 	`password` VARCHAR(256) NOT NULL,
 	`email` VARCHAR(300) NOT NULL,
-	`phone` INT(13) NOT NULL,
+	`phone` INT(15) NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
-	`source` INT(13) NOT NULL,
-	`destination` INT(13) NOT NULL,
+	`source` INT(15) NOT NULL,
+	`destination` INT(15) NOT NULL,
 	`received` TIMESTAMP NOT NULL,
 	`bearer` VARCHAR(4) NOT NULL,
 	`ref` INT NOT NULL,
