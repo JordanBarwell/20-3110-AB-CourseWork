@@ -21,11 +21,11 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
-	`source` INT(15) NOT NULL,
-	`destination` INT(15) NOT NULL,
+	`source` BIGINT(15) NOT NULL,
+	`destination` BIGINT(15) NOT NULL,
 	`received` TIMESTAMP NOT NULL,
 	`bearer` VARCHAR(4) NOT NULL,
-	`ref` INT NOT NULL,
+	`ref` BIGINT NOT NULL,
 	`message` TEXT NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
