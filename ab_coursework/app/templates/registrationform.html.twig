@@ -20,10 +20,25 @@
             <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="13" maxlength="13">
             <br><br>
             <input type="submit" value="Submit Details">
-            <input type="reset" value="Clear fields">
+            <input type="reset" value="clear fields">
             <br><br>
+            {% if existingEmailError %}
+            <small>{{ existingEmailError }}</small>
+            <br>
+            {% endif %}
+            {% if existingUsernameError %}
+            <small>{{ existingUsernameError }}</small>
+            <br>
+            {% endif %}
+            {% if existingPhoneError %}
+            <small>{{ existingPhoneError }}</small>
+            <br>
+            {% endif %}
             <a href="{{ path_for('homepage') }}">Home</a>
+            <br>
+            <br>
             <p>Already have an account?</p>
+            <br>
             <a href={{ path_for('login')  }}>Login</a>
         </fieldset>
     </form>
