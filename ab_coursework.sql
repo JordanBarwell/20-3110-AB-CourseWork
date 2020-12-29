@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS 'abcoursework_db';
+DROP DATABASE IF EXISTS abcoursework_db;
 
 CREATE DATABASE abcoursework_db COLLATE utf8_unicode_ci;
 
@@ -14,7 +14,8 @@ CREATE TABLE `users` (
 	`password` VARCHAR(256) NOT NULL,
 	`email` VARCHAR(300) NOT NULL,
 	`phone` INT(15) NOT NULL,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	CONSTRAINT UC_User UNIQUE (`username`, `email`, `phone`)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `messages`;
