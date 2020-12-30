@@ -60,14 +60,16 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
         $data = $this->get('SqlQueries');
 
         $dataExist = $data->checkUserDetailsExist($cleanedParameters);
-        if($dataExist['username'] === $cleanedParameters['cleanedSiteUsername']){
-            $existingUsernameError = 'Username Already Exists';
-        }
-        if($dataExist['email'] === $cleanedParameters['cleanedUserEmail']){
-            $existingEmailError = 'Email Already In Use';
-        }
-        if((int)$dataExist['phone'] === $cleanedParameters['cleanedPhoneNumber']){
-            $existingPhoneError = 'Phone Number Already In Use';
+        if (!empty($dataExist)) {
+            if ($dataExist['username'] === $cleanedParameters['cleanedSiteUsername']) {
+                $existingUsernameError = 'Username Already Exists';
+            }
+            if ($dataExist['email'] === $cleanedParameters['cleanedUserEmail']) {
+                $existingEmailError = 'Email Already In Use';
+            }
+            if ((int)$dataExist['phone'] === $cleanedParameters['cleanedPhoneNumber']) {
+                $existingPhoneError = 'Phone Number Already In Use';
+            }
         }
 
         if(empty($existingUsernameError) && empty($existingEmailError) && empty($existingPhoneError)){
