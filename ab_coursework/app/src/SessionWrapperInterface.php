@@ -41,4 +41,19 @@ interface SessionWrapperInterface
      */
     public function remove(string $key): bool;
 
+    /**
+     * Retrieves the session's CSRF token hashed with the form template filename for inserting into the template.
+     * @param string $formTemplateName The template name for the form.
+     * @return string The CSRF Token to be inserted into the form.
+     */
+    public function getCsrfToken(string $formTemplateName): string;
+
+    /**
+     * Verifies that the POST method CSRF token matches the session CSRF token hashed with the form template's filename.
+     * @param string $postFormToken The POST method CSRF token.
+     * @param string $formTemplateName The template name of the form the token was retrieved at.
+     * @return bool Whether the CSRF Token matches.
+     */
+    public function verifyCsrfToken(string $postFormToken, string $formTemplateName): bool;
+
 }
