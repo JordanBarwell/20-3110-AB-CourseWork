@@ -15,3 +15,7 @@ require 'routes/registration.php';
 require 'routes/login.php';
 require 'routes/registrationsubmit.php';
 require 'routes/menu.php';
+require 'routes/sendmessage.php';
+require 'routes/downloadmessage.php';
+require 'routes/viewmessage.php';
+require 'routes/logout.php';
