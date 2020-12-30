@@ -5,7 +5,21 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->get('/downloadmessage', function (Request $request, Response $response) use ($app) {
 
+    $soapWrapper = $this->get('SoapWrapper');
 
+    $userID = $this->get(\ABCoursework\SessionWrapperInterface::class)->get('userId');
+
+    $userData = $this->get('settings')['soap']['login'];
+
+    $params = [
+        'username' => $userData['username'],
+        'password' => $userData['password'],
+        'count' => 5,
+        'deviceMsisdn' => '',
+        'countryCode' => '44'
+    ];
+
+    $message = $soapWrapper->performSoapFunction($userID, 'peekMessages', $params);
 
     return $this->view->render($response,
         'messagedownloaded.html.twig',

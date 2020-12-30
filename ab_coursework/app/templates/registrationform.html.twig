@@ -5,10 +5,10 @@
         <p>{{ page_text }}</p>
         <fieldset>
             <label for="UserEmail">Enter Email Address:<small>{{ userEmail_error }}</small></label>
-            <input id="UserEmail" name="UserEmail" type="text" value="" size="20" maxlength="30">
+            <input id="UserEmail" name="UserEmail" type="text" value="" size="20" maxlength="300">
             <br><br>
             <label for="SiteUsername">Enter New Username:<small>{{ username_error }}</small></label>
-            <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="30">
+            <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="26">
             <br><br>
             <label for="SitePassword">Enter New Password:<small>{{ password_error }}</small></label>
             <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
@@ -17,7 +17,7 @@
             <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
             <br><br>
             <label for="PhoneNumber">Enter New Phone Number:<small>{{ phoneNumber_error }}</small></label>
-            <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="13" maxlength="13">
+            <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="20" maxlength="16">
             <br><br>
             <input type="submit" value="Submit Details">
             <input type="reset" value="clear fields">

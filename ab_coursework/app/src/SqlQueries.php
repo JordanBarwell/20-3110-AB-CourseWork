@@ -97,7 +97,44 @@ class SqlQueries
 
         $result = $queryBuilder->execute()->fetchAssociative();
         return $result;
+    }
 
+    public function insertMessage($parameters)
+    {
+        $queryBuilder = $this->queryBuilder->insert('messages')
+            ->values([
+                'source' => ':source',
+                'destination' => ':destination',
+                'received' => ':received',
+                'bearer' => ':bearer',
+                'ref' => ':ref',
+                'message' => ':message'
+            ])->setParameters([
+                ':source' => $parameters['source'],
+                ':destination' => $parameters['destination'],
+                ':received' => $parameters['received'],
+                ':bearer' => $parameters['bearer'],
+                ':ref' => $parameters['ref'],
+                ':message' => $parameters['message']
+            ]);
+
+        $storeResult = $queryBuilder->execute();
+
+        return $storeResult;
+    }
+
+    public function viewMessage(int $numberOfMsg)
+    {
+        $result = '';
+
+        $queryBuilder = $this->queryBuilder->select('source',
+            'destination', 'received', 'bearer', 'ref', 'message')
+            ->from('messages')
+            ->orderBy('received', 'DESC')
+            ->setMaxResults($numberOfMsg);
+
+        $result = $queryBuilder->execute()->fetchAllAssociative();
+        return $result;
     }
 
 }
