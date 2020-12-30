@@ -54,11 +54,6 @@ class SqlQueries
 
     public function storeUserData(array $cleanedParameters, string $hashedPassword)
     {
-        $storeResult = [];
-        $username = $cleanedParameters['cleanedSiteUsername'];
-        $email = $cleanedParameters['cleanedUserEmail'];
-        $phoneNumber = ($cleanedParameters['cleanedPhoneNumber']);
-
         $queryBuilder = $this->queryBuilder->insert('users')
             ->values([
                 'username' => ':username',
@@ -66,15 +61,19 @@ class SqlQueries
                 'email' => ':email',
                 'phone' => ':phone'
             ])->setParameters([
-                ':username' => $username,
+                ':username' => $cleanedParameters['cleanedSiteUsername'],
                 ':password' => $hashedPassword,
-                ':email' => $email,
-                ':phone' => $phoneNumber
+                ':email' => $cleanedParameters['cleanedUserEmail'],
+                ':phone' => ($cleanedParameters['cleanedPhoneNumber'])
             ]);
 
         $storeResult = $queryBuilder->execute();
 
-        return $storeResult;
+        if ($storeResult) {
+            $userId = $queryBuilder->getConnection()->lastInsertId();
+        }
+
+        return $userId;
     }
 
     public function checkUserDetailsExist($parameters)

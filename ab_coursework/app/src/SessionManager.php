@@ -66,7 +66,7 @@ class SessionManager implements SessionManagerInterface
         session_id($newSessionId);
         session_start();
         $_SESSION = $data;
-        sodium_memzero($data); // Wipe the old session's data from memory.
+        $data = null;
     }
 
     /**

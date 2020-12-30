@@ -70,4 +70,24 @@ class FileSessionWrapper implements SessionWrapperInterface
         unset($_SESSION[$key]);
         return !$this->check($key);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCsrfToken(string $formTemplateName): string
+    {
+        $token = $this->get('csrfToken');
+        return hash_hmac('sha256', $formTemplateName, $token);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function verifyCsrfToken(string $postFormToken, string $formTemplateName): bool
+    {
+        $token = $this->get('csrfToken');
+        $hashedToken = hash_hmac('sha256', $formTemplateName, $token);
+        return hash_equals($hashedToken, $postFormToken);
+    }
+
 }
