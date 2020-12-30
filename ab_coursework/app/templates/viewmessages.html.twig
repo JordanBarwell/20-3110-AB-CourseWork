@@ -3,7 +3,29 @@
     <form>
     <h1>{{ page_heading_1 }}</h1>
     <fieldset>
-        <p>Here are the messages</p>
+        <p>Here are the latest messages:</p>
+        <br><br>
+        <table>
+            <tr>
+                <th>Source</th>
+                <th>Destination</th>
+                <th>Received</th>
+                <th>Bearer</th>
+                <th>Reference</th>
+                <th>Message</th>
+            </tr>
+            {% for message in messages %}
+            <tr>
+                <td>{{ message.source }}</td>
+                <td>{{ message.destination }}</td>
+                <td>{{ message.received }}</td>
+                <td>{{ message.bearer }}</td>
+                <td>{{ message.ref }}</td>
+                <td>{{ message.message }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{{ path_for('menu') }}">Menu</a>
     </fieldset>
     <form>
 {% endblock %}

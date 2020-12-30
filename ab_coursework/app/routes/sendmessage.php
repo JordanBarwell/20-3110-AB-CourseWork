@@ -14,7 +14,7 @@ $app->get('/sendmessage', function (Request $request, Response $response) use ($
             'landing_page' => LANDING_PAGE,
             'page_title' => APP_NAME,
             'additional_info' => 'Created by Jared, Charlie and Jordan',
-            'page_heading_1' => 'Sent!',
+            'page_heading_1' => 'Message Sent!',
         ]);
 
 })->setName('sendmessage');

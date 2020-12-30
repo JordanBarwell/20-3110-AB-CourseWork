@@ -14,7 +14,6 @@ $app->get('/menu', function (Request $request, Response $response) use ($app) {
             'page_title' => APP_NAME,
             'additional_info' => 'Created by Jared, Charlie and Jordan',
             'page_heading_1' => 'Menu',
-            'page_heading_2' => 'Welcome User!',
         ]);
 
 })->setName('menu');
