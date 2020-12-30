@@ -68,8 +68,8 @@ $settings = [
                 ]
             ],
             'login' => [
-                'username' => '20_2405537',
-                'password' => 'Shbling21575**'
+                'username' => '',
+                'password' => ''
             ]
         ],
         'bcrypt' => [
