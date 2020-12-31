@@ -52,6 +52,18 @@ class SqlQueries
         $this->logger = $logger;
     }
 
+    public function getUserData(string $username)
+    {
+        $result = [];
+        $queryBuilder = $this->queryBuilder->select('id', 'username', 'password')
+            ->from('users')
+            ->where('username = :username')
+            ->setParameter(':username', $username);
+
+        $result = $queryBuilder->execute()->fetchAssociative();
+        return $result;
+    }
+
     public function storeUserData(array $cleanedParameters, string $hashedPassword)
     {
         $queryBuilder = $this->queryBuilder->insert('users')
@@ -78,7 +90,7 @@ class SqlQueries
 
     public function checkUserDetailsExist($parameters)
     {
-        $result = '';
+        $result = [];
         $username = $parameters['cleanedSiteUsername'];
         $email = $parameters['cleanedUserEmail'];
         $phoneNumber = $parameters['cleanedPhoneNumber'];
@@ -123,7 +135,7 @@ class SqlQueries
         return $storeResult;
     }
 
-    public function viewMessage(int $numberOfMsg)
+    public function viewMessages(int $numberOfMsg)
     {
         $result = '';
 

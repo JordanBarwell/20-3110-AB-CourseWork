@@ -1,23 +1,22 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form>
-        <h2>{{ page_heading_2 }}</h2>
-        <p>{{ page_text }}</p>
-        <fieldset>
-            <label for="Username">Enter Username:</label>
-            <input id="Username" name="Username" type="text" value="" size="20" maxlength="30">
-            <br><br>
-            <label for="Password">Enter Password:</label>
-            <input id="Password" name="Password" type="password" autocomplete="off" value="" size="20" maxlength="30">
-            <br><br>
-            <input type="submit" value="Submit Details">
-            <input type="reset" value="Clear Fields">
-            <br><br>
-            <a href="{{ path_for('homepage') }}">Home</a>
-            <br><br>
-            <p>Already have an account?</p>
-            <br>
-            <a href={{ path_for('registration')  }}>Register</a>
+    <h2>{{ page_heading_2 }}</h2>
+    <p>{{ page_text }}</p>
+    <form action="{{ action }}" method="{{ method }}">
+    <fieldset>
+        <label for="SiteUsername">Enter Username:<small>{{ username_error }}</small></label>
+        <input id="SiteUsername" name="SiteUsername" type="text" size="20" maxlength="30">
+        <br>
+        <label for="SitePassword">Enter Password:<small>{{ password_error }}</small></label>
+        <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" size="20" maxlength="100">
+        <br>
+        <input type="submit" value="Submit Details">
+        <input type="reset" value="Clear Fields">
         </fieldset>
     </form>
+    <div id="inner-content-div">
+        <a href="{{ path_for('homepage') }}">Home</a>
+        <p>Already have an account?</p>
+        <a href="{{ path_for('registration') }}">Register</a>
+    </div>
 {% endblock %}

@@ -28,10 +28,8 @@ require __DIR__ . '/app/dependencies.php';
 
 $app = new App($container);
 
+require __DIR__ . '/app/middleware.php';
 require __DIR__ . '/app/routes.php';
-
-//Starts Session
-$container->get(SessionManagerInterface::class)::start($container->get(SessionWrapperInterface::class));
 
 $app->run();
 
