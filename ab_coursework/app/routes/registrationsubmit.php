@@ -83,7 +83,7 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
             'phoneNumber_error' => $phoneNumberError
         ]);
 
-})->setName('registered');
+})->setName('registrationsubmit');
 
 function cleanupParameters($validator, $taintedParameters)
 {
