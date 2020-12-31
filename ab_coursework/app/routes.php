@@ -20,3 +20,4 @@ require 'routes/sendmessage.php';
 require 'routes/downloadmessage.php';
 require 'routes/viewmessage.php';
 require 'routes/logout.php';
+require 'routes/sendmessagesubmit.php';

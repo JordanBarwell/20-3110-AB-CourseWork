@@ -2,8 +2,6 @@
 {% block content %}
     <h1>{{ page_heading_1 }}</h1>
     <div id="inner-content-div">
-        <p>A message has been sent</p>
-        <hr>
-        <a href="{{ path_for('menu') }}">Menu</a>
+        <a href={{ path_for('menu') }}>Return to Menu</a>
     </div>
 {% endblock %}

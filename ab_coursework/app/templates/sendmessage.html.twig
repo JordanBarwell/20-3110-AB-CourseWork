@@ -1,0 +1,15 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <h1>{{ page_heading_1 }}</h1>
+    <div id="inner-content-div">
+        <form action="{{ action }}" method="{{ method }}">
+            <label for="Message">Type a message to send</label>
+            <br><br>
+            <input id="Message" name="Message" type="text" size="20" maxlength="26">
+            <br><br>
+            <input type="submit" value="Send Message">
+            <hr>
+            <a href="{{ path_for('menu') }}">Menu</a>
+        </form>
+    </div>
+{% endblock %}
