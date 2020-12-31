@@ -58,6 +58,8 @@ class XmlParser
      */
     public function parseXml(string $xmlToParse): array
     {
+        $this->parsedData = [];
+        $this->tempAttributes = [];
         xml_parse($this->xmlParser, $xmlToParse);
         return $this->parsedData;
     }

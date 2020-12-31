@@ -7,7 +7,7 @@ $app->get('/viewmessages', function (Request $request, Response $response) use (
 
     $query = $this->get('SqlQueries');
 
-    $viewMsg = $query->viewMessage(5);
+    $viewMsg = $query->viewMessages(25);
 
     return $this->view->render($response,
         'viewmessages.html.twig',

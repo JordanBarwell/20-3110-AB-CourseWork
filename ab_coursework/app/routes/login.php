@@ -14,7 +14,9 @@ $app->get('/login', function (Request $request, Response $response) use ($app) {
             'additional_info' => 'Created by Jared, Charlie and Jordan',
             'page_heading_1' => 'Team AB Coursework',
             'page_heading_2' => 'Login Form',
-            'page_text' => 'Please Enter Your User Info'
+            'page_text' => 'Please Enter Your User Info',
+            'action' => 'loginsubmit',
+            'method' => 'post'
         ]);
 
 })->setName('login');

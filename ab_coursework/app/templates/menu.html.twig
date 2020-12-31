@@ -1,26 +1,15 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form>
     <h1>{{ page_heading_1 }}</h1>
-    <p>Please select one of the following options</p>
-    <fieldset>
-        <br>
+    <h2>Please select one of the following options</h2>
+    <div id="inner-content-div">
         <p>Send a message below</p>
-        <br>
         <a href="{{ path_for('sendmessage') }}">Send New Message</a>
-        <br><br>
         <p>Download a message below</p>
-        <br>
         <a href="{{ path_for('downloadmessage') }}">Download Message</a>
-        <br><br>
         <p>View latest messages</p>
-        <br>
         <a href="{{ path_for('viewmessages') }}">View Messages</a>
-        <br><br>
         <p>Logout below</p>
-        <br>
-        <a href="{{ path_for('logout') }}">logout</a>
-        <br><br>
-    </fieldset>
-    <form>
+        <a href="{{ path_for('logout') }}">Logout</a>
+    </div>
 {% endblock %}

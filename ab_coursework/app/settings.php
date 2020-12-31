@@ -34,7 +34,8 @@ define('LANDING_PAGE', $urlRoot);
 $settings = [
     'settings' => [
         'displayErrorDetails' => true,
-        'addContentLengthHeader' => false,
+        'addContentLengthHeader' => true,
+        'determineRouteBeforeAppMiddleware' => true,
         'debug' => true,
         'classPath' => __DIR__ . '/src/',
         'naKey' => 'Jared & Jordan & Charlie Web App',

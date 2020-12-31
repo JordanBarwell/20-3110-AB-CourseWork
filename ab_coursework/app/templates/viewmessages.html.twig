@@ -1,10 +1,9 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form>
     <h1>{{ page_heading_1 }}</h1>
-    <fieldset>
+    <div id="inner-content-div">
         <p>Here are the latest messages:</p>
-        <br><br>
+        <br>
         <table>
             <tr>
                 <th>Source</th>
@@ -25,7 +24,7 @@
             </tr>
             {% endfor %}
         </table>
+        <hr>
         <a href="{{ path_for('menu') }}">Menu</a>
-    </fieldset>
-    <form>
+    </div>
 {% endblock %}

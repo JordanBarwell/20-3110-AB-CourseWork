@@ -1,45 +1,31 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <form action="{{action}}" method="{{method}}">
-        <h2>{{ page_heading_2 }}</h2>
-        <p>{{ page_text }}</p>
+    <h2>{{ page_heading_2 }}</h2>
+    <p>{{ page_text }}</p>
+    <form action="{{ action }}" method="{{ method }}">
         <fieldset>
             <label for="UserEmail">Enter Email Address:<small>{{ userEmail_error }}</small></label>
-            <input id="UserEmail" name="UserEmail" type="text" value="" size="20" maxlength="300">
-            <br><br>
+            <input id="UserEmail" name="UserEmail" type="text" size="20" maxlength="300">
+            <br>
             <label for="SiteUsername">Enter New Username:<small>{{ username_error }}</small></label>
-            <input id="SiteUsername" name="SiteUsername" type="text" value="" size="20" maxlength="26">
-            <br><br>
+            <input id="SiteUsername" name="SiteUsername" type="text" size="20" maxlength="26">
+            <br>
             <label for="SitePassword">Enter New Password:<small>{{ password_error }}</small></label>
-            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
-            <br><br>
+            <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" size="20" maxlength="100">
+            <br>
             <label for="ConfirmPassword">Confirm New Password:<small>{{ confirmPassword_error }}</small></label>
-            <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" value="" size="20" maxlength="100">
-            <br><br>
+            <input id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="off" size="20" maxlength="100">
+            <br>
             <label for="PhoneNumber">Enter New Phone Number:<small>{{ phoneNumber_error }}</small></label>
-            <input id="PhoneNumber" name="PhoneNumber" type="text" value="" size="20" maxlength="16">
-            <br><br>
+            <input id="PhoneNumber" name="PhoneNumber" type="text" size="20" maxlength="16">
+            <br>
             <input type="submit" value="Submit Details">
-            <input type="reset" value="clear fields">
-            <br><br>
-            {% if existingEmailError %}
-            <small>{{ existingEmailError }}</small>
-            <br>
-            {% endif %}
-            {% if existingUsernameError %}
-            <small>{{ existingUsernameError }}</small>
-            <br>
-            {% endif %}
-            {% if existingPhoneError %}
-            <small>{{ existingPhoneError }}</small>
-            <br>
-            {% endif %}
-            <a href="{{ path_for('homepage') }}">Home</a>
-            <br>
-            <br>
-            <p>Already have an account?</p>
-            <br>
-            <a href={{ path_for('login')  }}>Login</a>
+            <input type="reset" value="Clear Fields">
         </fieldset>
     </form>
+    <div id="inner-content-div">
+        <a href="{{ path_for('homepage') }}">Home</a>
+        <p>Already have an account?</p>
+        <a href="{{ path_for('login') }}">Login</a>
+    </div>
 {% endblock %}

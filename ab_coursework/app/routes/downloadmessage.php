@@ -14,7 +14,7 @@ $app->get('/downloadmessage', function (Request $request, Response $response) us
     $params = [
         'username' => $userData['username'],
         'password' => $userData['password'],
-        'count' => 5,
+        'count' => 25,
         'deviceMsisdn' => '',
         'countryCode' => '44'
     ];
