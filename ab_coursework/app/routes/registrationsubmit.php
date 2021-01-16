@@ -7,59 +7,29 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->post('/registrationsubmit', function (Request $request, Response $response) use ($app) {
 
-    $userEmailError = $usernameError = $phoneNumberError = $passwordError = $confirmPasswordError = '';
-
     $validator = $this->get('Validator');
     $taintedParameters = $request->getParsedBody();
-    $cleanedParameters = cleanupParameters($validator, $taintedParameters);
+    $cleanedParameters = cleanupRegistrationParameters($validator, $taintedParameters);
+    $errors = getRegistrationValidationErrors($validator, $cleanedParameters);
 
-    if (empty($cleanedParameters['cleanedSitePassword'])) {
-        $passwordError = 'This field is required!';
-    } elseif (strlen($cleanedParameters['cleanedSitePassword']) > 100) {
-        $passwordError = 'Password must be less than or equal to 100 characters!';
-    }
-
-    if (empty($cleanedParameters['cleanedConfirmPassword'])) {
-        $confirmPasswordError = 'This field is required!';
-    } elseif ($cleanedParameters['cleanedConfirmPassword'] !== $cleanedParameters['cleanedSitePassword']) {
-        $confirmPasswordError = 'Passwords do not match!';
-    }
-
-    if (!$validator->areAllValid()) {
-        $validatorErrors = $validator->getErrors();
-        $userEmailError = $validatorErrors['UserEmail'];
-        $usernameError = $validatorErrors['SiteUsername'];
-        $phoneNumberError = $validatorErrors['PhoneNumber'];
-    }
-
-    if ($validator->areAllValid() && empty($confirmPasswordError) && empty($passwordError)) {
-
-        $hashedPassword = hashPassword($app, $cleanedParameters['cleanedSitePassword']);
+    if (empty($errors)) {
+        $cleanedParameters['cleanedSitePassword'] = hashPassword($app, $cleanedParameters['cleanedSitePassword']);
         $cleanedParameters['cleanedPhoneNumber'] = (int)substr($cleanedParameters['cleanedPhoneNumber'], 1);
 
-        $data = $this->get('SqlQueries');
+        $model = $this->get('UserModel');
 
-        $dataExist = $data->checkUserDetailsExist($cleanedParameters);
-        if (!empty($dataExist)) {
-            if ($dataExist['username'] === $cleanedParameters['cleanedSiteUsername']) {
-                $usernameError = 'Username Already Exists!';
-            }
-            if ($dataExist['email'] === $cleanedParameters['cleanedUserEmail']) {
-                $userEmailError = 'Email Already In Use!';
-            }
-            if ((int)$dataExist['phone'] === $cleanedParameters['cleanedPhoneNumber']) {
-                $phoneNumberError = 'Phone Number Already In Use!';
-            }
+        if ($model->checkUserExists($cleanedParameters)) {
+            $errors = array_merge($errors, $model->getErrors());
         }
 
-        if(empty($usernameError) && empty($userEmailError) && empty($phoneNumberError)) {
-            $userId = $data->storeUserData($cleanedParameters, $hashedPassword);
-            if ($userId) {
-                $sessionWrapper = $this->get(SessionWrapperInterface::class);
-                $sessionWrapper->set('userId', $userId);
-                $this->get(SessionManagerInterface::class)::regenerate($sessionWrapper);
+        if(empty($errors)) {
+            $sessionWrapper = $this->get(SessionWrapperInterface::class);
+            $sessionManager = $this->get(SessionManagerInterface::class);
+            if ($model->registerUser($cleanedParameters, $sessionWrapper, $sessionManager)) {
                 $response = $response->withStatus(303);
                 return $response->withHeader('Location', 'menu');
+            } else {
+                $errors = array_merge($errors, $model->getErrors());
             }
         }
     }
@@ -76,16 +46,17 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
             'page_heading_1' => 'Team AB Coursework',
             'page_heading_2' => 'Registration Form',
             'page_text' => 'Please Create Your New User Info',
-            'password_error' => $passwordError,
-            'confirmPassword_error' => $confirmPasswordError,
-            'userEmail_error' => $userEmailError,
-            'username_error' => $usernameError,
-            'phoneNumber_error' => $phoneNumberError
+            'database_error' => $errors['Database'] ?? '',
+            'userEmail_error' => $errors['UserEmail'] ?? '',
+            'username_error' => $errors['SiteUsername'] ?? '',
+            'password_error' => $errors['SitePassword'] ?? '',
+            'confirmPassword_error' => $errors['ConfirmPassword'] ?? '',
+            'phoneNumber_error' => $errors['PhoneNumber'] ?? ''
         ]);
 
 })->setName('registrationsubmit');
 
-function cleanupParameters($validator, $taintedParameters)
+function cleanupRegistrationParameters($validator, $taintedParameters): array
 {
     $cleanedParameters = [];
 
@@ -102,7 +73,31 @@ function cleanupParameters($validator, $taintedParameters)
     return $cleanedParameters;
 }
 
-function hashPassword($app, $passwordForHashing)
+function getRegistrationValidationErrors($validator, $cleanedParameters): array
+{
+    $errors = [];
+
+    if (empty($cleanedParameters['cleanedSitePassword'])) {
+        $errors['SitePassword'] = 'This field is required!';
+    } elseif (strlen($cleanedParameters['cleanedSitePassword']) > 100) {
+        $errors['SitePassword'] = 'Password must be less than or equal to 100 characters!';
+    }
+
+    if (empty($cleanedParameters['cleanedConfirmPassword'])) {
+        $errors['ConfirmPassword'] = 'This field is required!';
+    } elseif ($cleanedParameters['cleanedConfirmPassword'] !== $cleanedParameters['cleanedSitePassword']) {
+        $errors['ConfirmPassword'] = 'Passwords do not match!';
+    }
+
+    if (!$validator->areAllValid()) {
+        $validatorErrors = $validator->getErrors();
+        $errors = array_merge($errors, $validatorErrors);
+    }
+
+    return $errors;
+}
+
+function hashPassword($app, $passwordForHashing): string
 {
     $bcryptWrapper = $app->getContainer()->get('BcryptWrapper');
     return $bcryptWrapper->hash($passwordForHashing);

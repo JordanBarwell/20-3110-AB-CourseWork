@@ -6,7 +6,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->get('/logout', function (Request $request, Response $response) use ($app) {
 
     $wrapper = $this->get(\ABCoursework\SessionWrapperInterface::class);
-    $this->get(\ABCoursework\SessionManagerInterface::class)::destroy($wrapper);
+    $manager = $this->get(\ABCoursework\SessionManagerInterface::class);
+    $this->get('UserModel')->logoutUser($wrapper, $manager);
 
     return $this->view->render($response,
         'loggedout.html.twig',

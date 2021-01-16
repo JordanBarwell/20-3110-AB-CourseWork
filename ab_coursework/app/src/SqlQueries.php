@@ -14,100 +14,70 @@ use Psr\Log\LoggerInterface;
 class SqlQueries
 {
     /**
-     * @var LoggerInterface Logger used to log database queries.
+     * @var QueryBuilder|null Doctrine query builder with connection to database or null on connection failure.
      */
-    private LoggerInterface $logger;
+    private ?QueryBuilder $queryBuilder;
 
     /**
-     * @var QueryBuilder Doctrine query builder with connection to database.
+     * Creates a new instance of SqlQueries with the given QueryBuilder.
+     * @param QueryBuilder|null $queryBuilder Query Builder for building SQL queries or null if DB connection failed.
      */
-    private QueryBuilder $queryBuilder;
-
-    /**
-     * Creates a new instance of SqlQueries with the given QueryBuilder and Logger.
-     * @param QueryBuilder $queryBuilder Query Builder for building SQL queries.
-     * @param LoggerInterface $logger Logger for logging queries.
-     */
-    public function __construct(LoggerInterface $logger, QueryBuilder $queryBuilder)
-    {
-        $this->logger = $logger;
-        $this->queryBuilder = $queryBuilder;
-    }
-
-    /**
-     * Sets new QueryBuilder for all future queries of this instance.
-     * @param QueryBuilder $queryBuilder New QueryBuilder.
-     */
-    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    public function __construct(?QueryBuilder $queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
     }
 
-    /**
-     * Sets Logger to the given logger.
-     * @param LoggerInterface $logger New Logger.
-     */
-    public function setLogger(LoggerInterface $logger)
+    public function checkUserDetails(string $username, string $email, string $phoneNumber)
     {
-        $this->logger = $logger;
-    }
+        $result = null;
 
-    public function getUserData(string $username)
-    {
-        $result = [];
-        $queryBuilder = $this->queryBuilder->select('id', 'username', 'password')
-            ->from('users')
-            ->where('username = :username')
-            ->setParameter(':username', $username);
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select('username', 'email', 'phone')
+                ->from('users')
+                ->where('username = :username ')
+                ->orWhere('email = :email')
+                ->orWhere('phone = :phone')
+                ->setParameters([
+                    'username' => $username,
+                    'email' => $email,
+                    'phone' => $phoneNumber
+                ]);
+        }
 
-        $result = $queryBuilder->execute()->fetchAssociative();
         return $result;
     }
 
-    public function storeUserData(array $cleanedParameters, string $hashedPassword)
+    public function insertUser(string $username, string $passwordHash, string $email, int $phoneNumber)
     {
-        $queryBuilder = $this->queryBuilder->insert('users')
+        $result = null;
+
+        $result = $this->queryBuilder->insert('users')
             ->values([
                 'username' => ':username',
                 'password' => ':password',
                 'email' => ':email',
                 'phone' => ':phone'
             ])->setParameters([
-                ':username' => $cleanedParameters['cleanedSiteUsername'],
-                ':password' => $hashedPassword,
-                ':email' => $cleanedParameters['cleanedUserEmail'],
-                ':phone' => ($cleanedParameters['cleanedPhoneNumber'])
+                'username' => $username,
+                'password' => $passwordHash,
+                'email' => $email,
+                'phone' => $phoneNumber
             ]);
 
-        $storeResult = $queryBuilder->execute();
-
-        if ($storeResult) {
-            $userId = $queryBuilder->getConnection()->lastInsertId();
-        }
-
-        return $userId;
+        return $result;
     }
 
-    public function checkUserDetailsExist($parameters)
+    public function getUserLoginData(string $username)
     {
-        $result = [];
-        $username = $parameters['cleanedSiteUsername'];
-        $email = $parameters['cleanedUserEmail'];
-        $phoneNumber = $parameters['cleanedPhoneNumber'];
+        $result = null;
 
-        $queryBuilder = $this->queryBuilder->select('username', 'email', 'phone')
-            ->from('users')
-            ->where(
-                'username = :username ')
-            ->orWhere('email = :email')
-            ->orWhere('phone = :phone')
-            ->setParameters([
-                ':username' => $username,
-                ':email' => $email,
-                ':phone' => $phoneNumber
-            ]);
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select('id', 'username', 'password')
+                ->from('users')
+                ->where('username = :username')
+                ->setParameter('username', $username);
+        }
 
-        $result = $queryBuilder->execute()->fetchAssociative();
         return $result;
     }
 

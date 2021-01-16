@@ -15,7 +15,7 @@ $app->post('/sendmessagesubmit', function (Request $request, Response $response)
     $switchMsg1 = $switchMsg2 = $switchMsg3 = $switchMsg4 = '';
 
     if ($input['radioFan'] === "Forward"){
-          $fanDirectionMsg = '<FanDirection>Forwards</FanDirection>';
+        $fanDirectionMsg = '<FanDirection>Forwards</FanDirection>';
     } elseif ($input['radioFan'] === "Reverse"){
         $fanDirectionMsg = '<FanDirection>Reverse</FanDirection>';
     }
