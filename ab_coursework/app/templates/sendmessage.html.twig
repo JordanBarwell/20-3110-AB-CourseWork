@@ -5,37 +5,37 @@
         <form action="{{ action }}" method="{{ method }}">
             <label for="Message">Select an option below of message to be sent</label>
             <br><br>
-            <label for="Temperature">Temperature (C)</label>
+            <label for="Temperature">Temperature (C)<small>{{ tempError }}</small></label>
             <input type="text" id="Temperature" name="Temperature">
             <br><br>
-            <label for="FanStatus">Fan Direction</label>
+            <label for="FanStatus">Fan Direction<small>{{ fanError }}</small></label>
             <input type="radio" value="Forward" name="radioFan">
             <label for="Forward">Forward</label>
             <input type="radio" value="Reverse" name="radioFan">
             <label for="Reverse">Reverse</label>
             <br><br>
-            <label for="KeyPad">Last Digit Entered</label>
+            <label for="KeyPad">Last Digit Entered<small>{{ lastDigitError }}</small></label>
             <input type="text" id="KeyPad" name="KeyPad" size="10">
             <br><br>
-            <label for="Switch1">Switch 1</label>
+            <label for="Switch1">Switch 1<small>{{ switch1Error }}</small></label>
             <input type="radio" value="switchOneON" name="radioSwitch1">
             <label for="SwitchOneON">ON</label>
             <input type="radio" value="switchOneOFF" name="radioSwitch1">
             <label for="SwitchOneOFF">OFF</label>
             <br><br>
-            <label for="Switch2">Switch 2</label>
+            <label for="Switch2">Switch 2<small>{{ switch2Error }}</small></label>
             <input type="radio" value="switchTwoON" name="radioSwitch2">
             <label for="SwitchTwoON">ON</label>
             <input type="radio" value="switchTwoOFF" name="radioSwitch2">
             <label for="SwitchTwoOFF">OFF</label>
             <br><br>
-            <label for="Switch3">Switch 3</label>
+            <label for="Switch3">Switch 3<small>{{ switch3Error }}</small></label>
             <input type="radio" value="switchThreeON" name="radioSwitch3">
             <label for="SwitchThreeON">ON</label>
             <input type="radio" value="switchThreeOFF" name="radioSwitch3">
             <label for="SwitchThreeOFF">OFF</label>
             <br><br>
-            <label for="Switch4">Switch 4</label>
+            <label for="Switch4">Switch 4<small>{{ switch4Error }}</small></label>
             <input type="radio" value="switchFourON" name="radioSwitch4">
             <label for="SwitchFourON">ON</label>
             <input type="radio" value="switchFourOFF" name="radioSwitch4">
