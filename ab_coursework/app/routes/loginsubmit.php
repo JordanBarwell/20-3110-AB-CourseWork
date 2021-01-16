@@ -9,10 +9,15 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->post('/loginsubmit', function (Request $request, Response $response) use ($app) {
 
+    $formName = 'loginform.html.twig';
+
     $validator = $this->get('Validator');
+    $sessionWrapper = $this->get(SessionWrapperInterface::class);
+    $sessionManager = $this->get(SessionManagerInterface::class);
+
     $taintedParameters = $request->getParsedBody();
     $cleanedParameters = cleanupLoginParameters($validator, $taintedParameters);
-    $errors = getLoginValidationErrors($validator, $cleanedParameters);
+    $errors = getLoginValidationErrors($validator, $sessionWrapper, $formName, $cleanedParameters);
 
     if (empty($errors)) {
         $model = $this->get('UserModel');
@@ -21,8 +26,6 @@ $app->post('/loginsubmit', function (Request $request, Response $response) use (
         if ($loginData) {
             $bcryptWrapper = $this->get('BcryptWrapper');
             if (checkLoginDetailsMatch($bcryptWrapper, $loginData, $cleanedParameters)) {
-                $sessionWrapper = $this->get(SessionWrapperInterface::class);
-                $sessionManager = $this->get(SessionManagerInterface::class);
                 if ($model->loginUser($loginData['username'], $sessionWrapper, $sessionManager)) {
                     $response = $response->withStatus(303);
                     return $response->withHeader('Location', 'menu');
@@ -37,7 +40,7 @@ $app->post('/loginsubmit', function (Request $request, Response $response) use (
     }
 
     return $this->view->render($response,
-        'loginform.html.twig',
+        $formName,
         [
             'css_path' => CSS_PATH,
             'landing_page' => LANDING_PAGE,
@@ -49,27 +52,38 @@ $app->post('/loginsubmit', function (Request $request, Response $response) use (
             'page_heading_2' => 'Login Form',
             'page_text' => 'Please Enter Your User Info',
             'database_error' => $errors['Database'] ?? '',
+            'csrf_error' => $errors['CsrfToken'] ?? '',
             'username_error' => $errors['SiteUsername'] ?? '',
-            'password_error' => $errors['SitePassword'] ?? ''
+            'password_error' => $errors['SitePassword'] ?? '',
+            'csrf_token' => $this->get(SessionWrapperInterface::class)->getCsrfToken($formName)
         ]);
 
 })->setName('loginsubmit');
 
-function cleanupLoginParameters(Validator $validator, $taintedParameters): array
+function cleanupLoginParameters(Validator $validator, array $taintedParameters): array
 {
     $cleanedParameters = [];
 
     $taintedUsername = $taintedParameters['SiteUsername'] ?? '' ;
 
+    $cleanedParameters['cleanedCsrfToken'] = $taintedParameters['CsrfToken'] ?? '';
     $cleanedParameters['cleanedSiteUsername'] = $validator->validateString('SiteUsername', $taintedUsername, 1, 26);
     $cleanedParameters['cleanedSitePassword'] = $taintedParameters['SitePassword'] ?? '' ;
 
     return $cleanedParameters;
 }
 
-function getLoginValidationErrors(Validator $validator, $cleanedParameters): array
+function getLoginValidationErrors(
+    Validator $validator,
+    SessionWrapperInterface $sessionWrapper,
+    string $formName,
+    array $cleanedParameters): array
 {
     $errors = [];
+
+    if (!$sessionWrapper->verifyCsrfToken($cleanedParameters['cleanedCsrfToken'], $formName)) {
+        $errors['CsrfToken'] = 'CSRF Error, please try again';
+    }
 
     if (empty($cleanedParameters['cleanedSitePassword'])) {
         $errors['SitePassword'] = 'This field is required!';
