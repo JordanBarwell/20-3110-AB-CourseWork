@@ -9,7 +9,6 @@
  *
  */
 use \Slim\{Container, App};
-use \ABCoursework\{SessionManagerInterface, SessionWrapperInterface};
 
 require 'vendor/autoload.php';
 

@@ -31,7 +31,7 @@ class SessionManager implements SessionManagerInterface
 
         // Validate the session and verify the user.
         if (!(self::validateSession($wrapper) && self::verifyUser($wrapper))) {
-            $wrapper->remove('userId');
+            $wrapper->remove('username');
             $wrapper->remove('csrfToken');
         }
 

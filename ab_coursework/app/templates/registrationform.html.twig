@@ -4,6 +4,9 @@
     <p>{{ page_text }}</p>
     <form action="{{ action }}" method="{{ method }}">
         <fieldset>
+            {% if database_error is not empty %}
+                <small>{{ database_error }}</small>
+            {% endif %}
             <label for="UserEmail">Enter Email Address:<small>{{ userEmail_error }}</small></label>
             <input id="UserEmail" name="UserEmail" type="text" size="20" maxlength="300">
             <br>

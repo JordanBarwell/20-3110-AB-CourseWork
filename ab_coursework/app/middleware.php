@@ -39,10 +39,10 @@ $loggedInMiddleware = function (ServerRequestInterface $request, ResponseInterfa
     // Start the session.
     $manager::start($wrapper);
 
-    if (!$wrapper->check('userId') && !in_array($routeName, $notLoggedInRoutes)) {
+    if (!$wrapper->check('username') && !in_array($routeName, $notLoggedInRoutes)) {
         // If not logged and not private, redirect to homepage.
         return $response->withRedirect('/ab_coursework_public/');
-    } elseif ($wrapper->check('userId') && in_array($routeName, $notLoggedInRoutes)) {
+    } elseif ($wrapper->check('username') && in_array($routeName, $notLoggedInRoutes)) {
         // Else if logged in and going to not logged in page go to menu.
         return $response->withRedirect('/ab_coursework_public/menu');
     } else {

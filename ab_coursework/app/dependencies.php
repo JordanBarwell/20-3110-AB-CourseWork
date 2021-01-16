@@ -9,6 +9,21 @@
  *
  */
 
+use ABCoursework\Base64Wrapper;
+use ABCoursework\BcryptWrapper;
+use ABCoursework\DatabaseWrapper;
+use ABCoursework\FileSessionWrapper;
+use ABCoursework\LibSodiumWrapper;
+use ABCoursework\SessionManager;
+use ABCoursework\SessionManagerInterface;
+use ABCoursework\SessionWrapperInterface;
+use ABCoursework\SoapWrapper;
+use ABCoursework\SqlQueries;
+use ABCoursework\UserModel;
+use ABCoursework\Validator;
+use ABCoursework\XmlParser;
+use Psr\Log\LoggerInterface;
+
 $container['view'] = function ($container) {
   $view = new Slim\Views\Twig(
     $container['settings']['view']['templatePath'],
@@ -23,7 +38,7 @@ $container['view'] = function ($container) {
   return $view;
 };
 
-$container[\Psr\Log\LoggerInterface::class] = function ($container) {
+$container[LoggerInterface::class] = function ($container) {
     $logger = new Monolog\Logger('logger');
     $logFile = '../../logs/ABCoursework.log';
 
@@ -40,42 +55,45 @@ $container[\Psr\Log\LoggerInterface::class] = function ($container) {
 };
 
 $container['SoapWrapper'] = function ($container) {
-    return new ABCoursework\SoapWrapper($container[\Psr\Log\LoggerInterface::class], $container['settings']['soap']['connection']);
+    return new SoapWrapper($container[LoggerInterface::class], $container['settings']['soap']['connection']);
 };
 
 $container['Base64Wrapper'] = function ($container) {
-    return new ABCoursework\Base64Wrapper();
+    return new Base64Wrapper();
 };
 
 $container['BcryptWrapper'] = function ($container) {
-    return new ABCoursework\BcryptWrapper($container['settings']['bcrypt']);
+    return new BcryptWrapper($container['settings']['bcrypt']);
 };
 
 $container['LibSodiumWrapper'] = function ($container) {
-    return new ABCoursework\LibSodiumWrapper($container['settings']['naKey'], $container['Base64Wrapper']);
+    return new LibSodiumWrapper($container['settings']['naKey'], $container['Base64Wrapper']);
 };
 
 $container['XmlParser'] = function ($container) {
-    return new ABCoursework\XmlParser();
+    return new XmlParser();
 };
 
-$container[\ABCoursework\SessionWrapperInterface::class] = function ($container) {
-    return new \ABCoursework\FileSessionWrapper($container['LibSodiumWrapper']);
+$container[SessionWrapperInterface::class] = function ($container) {
+    return new FileSessionWrapper($container['LibSodiumWrapper']);
 };
 
-$container[\ABCoursework\SessionManagerInterface::class] = function ($container) {
-    return new \ABCoursework\SessionManager();
+$container[SessionManagerInterface::class] = function ($container) {
+    return new SessionManager();
 };
 
 $container['Validator'] = function ($container) {
-    return new ABCoursework\Validator();
+    return new Validator();
 };
 
-$container['QueryBuilder'] = function ($container) {
-    $connection = \Doctrine\DBAL\DriverManager::getConnection($container['settings']['doctrine']);
-    return $connection->createQueryBuilder();
+$container['DatabaseWrapper'] = function ($container) {
+    return new DatabaseWrapper($container[LoggerInterface::class], $container['settings']['doctrine']);
 };
 
 $container['SqlQueries'] = function ($container) {
-    return new ABCoursework\SqlQueries($container[\Psr\Log\LoggerInterface::class], $container['QueryBuilder']);
+    return new SqlQueries($container['DatabaseWrapper']->getQueryBuilder());
+};
+
+$container['UserModel'] = function ($container) {
+    return new UserModel($container[LoggerInterface::class], $container['DatabaseWrapper'], $container['SqlQueries']);
 };

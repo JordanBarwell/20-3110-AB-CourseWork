@@ -1,48 +1,39 @@
 <?php
 
+use ABCoursework\BcryptWrapper;
 use ABCoursework\SessionManagerInterface;
 use ABCoursework\SessionWrapperInterface;
+use ABCoursework\Validator;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->post('/loginsubmit', function (Request $request, Response $response) use ($app) {
 
-    $usernameError = $passwordError = '';
-
     $validator = $this->get('Validator');
+    $taintedParameters = $request->getParsedBody();
+    $cleanedParameters = cleanupLoginParameters($validator, $taintedParameters);
+    $errors = getLoginValidationErrors($validator, $cleanedParameters);
 
-    $userInput = $request->getParsedBody();
-    $username = $userInput['SiteUsername'] ?? '' ;
-    $cleanedPassword = $userInput['SitePassword'] ?? '' ;
-    $cleanedUsername = $validator->validateString('SiteUsername', $username, 1, 26);
+    if (empty($errors)) {
+        $model = $this->get('UserModel');
+        $loginData = $model->getLoginDetails($cleanedParameters['cleanedSiteUsername']);
 
-    if (empty($cleanedPassword)) {
-        $passwordError = 'This field is required!';
-    } elseif (strlen($cleanedPassword) > 100) {
-        $passwordError = 'Password must be less than or equal to 100 characters';
-    }
-
-    if (!$validator->isValid('SiteUsername')) {
-        $usernameError = $validator->getError('SiteUsername');
-    }
-
-    if (empty($usernameError) && empty($passwordError)) {
-        $queries = $this->get('SqlQueries');
-        $userData = $queries->getUserData($cleanedUsername);
-
-        if ($userData) {
+        if ($loginData) {
             $bcryptWrapper = $this->get('BcryptWrapper');
-            $passwordVerified = $bcryptWrapper->verify($cleanedPassword, $userData['password']);
-            if ($userData['username'] === $cleanedUsername && $passwordVerified) {
+            if (checkLoginDetailsMatch($bcryptWrapper, $loginData, $cleanedParameters)) {
                 $sessionWrapper = $this->get(SessionWrapperInterface::class);
-                $sessionWrapper->set('userId', $userData['id']);
-                $this->get(SessionManagerInterface::class)::regenerate($sessionWrapper);
-                $response = $response->withStatus(303);
-                return $response->withHeader('Location', 'menu');
+                $sessionManager = $this->get(SessionManagerInterface::class);
+                if ($model->loginUser($loginData['username'], $sessionWrapper, $sessionManager)) {
+                    $response = $response->withStatus(303);
+                    return $response->withHeader('Location', 'menu');
+                }
+            } else {
+                $errors['SiteUsername'] = $errors['SitePassword'] = 'Your username or password is incorrect.';
             }
+        } else {
+            $errors = array_merge($errors, $model->getErrors());
+            $errors['SiteUsername'] = $errors['SitePassword'] = 'Your username or password is incorrect.';
         }
-
-        $usernameError = $passwordError = 'Username or Password is incorrect!';
     }
 
     return $this->view->render($response,
@@ -57,8 +48,50 @@ $app->post('/loginsubmit', function (Request $request, Response $response) use (
             'page_heading_1' => 'Team AB Coursework',
             'page_heading_2' => 'Login Form',
             'page_text' => 'Please Enter Your User Info',
-            'password_error' => $passwordError,
-            'username_error' => $usernameError,
+            'database_error' => $errors['Database'] ?? '',
+            'username_error' => $errors['SiteUsername'] ?? '',
+            'password_error' => $errors['SitePassword'] ?? ''
         ]);
 
 })->setName('loginsubmit');
+
+function cleanupLoginParameters(Validator $validator, $taintedParameters): array
+{
+    $cleanedParameters = [];
+
+    $taintedUsername = $taintedParameters['SiteUsername'] ?? '' ;
+
+    $cleanedParameters['cleanedSiteUsername'] = $validator->validateString('SiteUsername', $taintedUsername, 1, 26);
+    $cleanedParameters['cleanedSitePassword'] = $taintedParameters['SitePassword'] ?? '' ;
+
+    return $cleanedParameters;
+}
+
+function getLoginValidationErrors(Validator $validator, $cleanedParameters): array
+{
+    $errors = [];
+
+    if (empty($cleanedParameters['cleanedSitePassword'])) {
+        $errors['SitePassword'] = 'This field is required!';
+    } elseif (strlen($cleanedParameters['cleanedSitePassword']) > 100) {
+        $errors['SitePassword'] = 'Password must be less than or equal to 100 characters';
+    }
+
+    if (!$validator->areAllValid()) {
+        $validatorErrors = $validator->getErrors();
+        $errors = array_merge($errors, $validatorErrors);
+    }
+
+    return $errors;
+}
+
+function checkLoginDetailsMatch(BcryptWrapper $bcryptWrapper,array $loginDetails, array $cleanedParameters)
+{
+    $result = false;
+
+    if ($loginDetails['username'] === $cleanedParameters['cleanedSiteUsername']) {
+        $result = $bcryptWrapper->verify($cleanedParameters['cleanedSitePassword'], $loginDetails['password']);
+    }
+
+    return $result;
+}

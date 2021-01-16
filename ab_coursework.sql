@@ -29,3 +29,5 @@ CREATE TABLE `messages` (
 	`message` TEXT NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+INSERT INTO `users` (`username`, `password`, `email`, `phone`) VALUES ('admin', '$2y$14$55DAPtAKbA1oP/yfrS1Ys.u.R0YOyKnzL53X3mBVLyLnA8ZTjVu.m', 'admin@fake-email.com', '440000000000000');
