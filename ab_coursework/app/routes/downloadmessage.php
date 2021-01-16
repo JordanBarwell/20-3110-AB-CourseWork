@@ -7,7 +7,7 @@ $app->get('/downloadmessage', function (Request $request, Response $response) us
 
     $soapWrapper = $this->get('SoapWrapper');
 
-    $userID = $this->get(\ABCoursework\SessionWrapperInterface::class)->get('userId');
+    $username = $this->get(\ABCoursework\SessionWrapperInterface::class)->get('username');
 
     $userData = $this->get('settings')['soap']['login'];
 
@@ -19,7 +19,15 @@ $app->get('/downloadmessage', function (Request $request, Response $response) us
         'countryCode' => '44'
     ];
 
-    $message = $soapWrapper->performSoapFunction($userID, 'peekMessages', $params);
+    $messages = $soapWrapper->performSoapFunction($username, 'peekMessages', $params);
+
+    $xmlParser = $this->get('XmlParser');
+
+    $parseMsg = [];
+
+    foreach($messages as $message){
+       $parseMsg[] = $xmlParser->parseXml($message);
+    }
 
     return $this->view->render($response,
         'messagedownloaded.html.twig',
