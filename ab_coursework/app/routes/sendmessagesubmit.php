@@ -9,7 +9,6 @@ $app->post('/sendmessagesubmit', function (Request $request, Response $response)
     $validator = $this->get('Validator');
     $input = $request->getParsedBody();
     $cleanedInput = cleanUpParams($validator, $input);
-    $groupID = '<groupID>AB</groupID>';
     $tempMsg = '<Temperature>' . $cleanedInput['cleanedTemp'] . '</Temperature>';
     $fanDirectionMsg = '';
     $lastDigitMsg = '<LastDigitEntered>' . $cleanedInput['cleanedDigits'] . '</LastDigitEntered>';
@@ -46,7 +45,6 @@ $app->post('/sendmessagesubmit', function (Request $request, Response $response)
     }
 
     $msgArray = [
-        $groupID,
         $tempMsg,
         $fanDirectionMsg,
         $lastDigitMsg,

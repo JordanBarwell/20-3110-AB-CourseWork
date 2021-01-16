@@ -6,7 +6,13 @@
         <fieldset>
             {% if database_error is not empty %}
                 <small>{{ database_error }}</small>
+                <br>
             {% endif %}
+            {% if csrf_error is not empty %}
+                <small>{{ csrf_error }}</small>
+                <br>
+            {% endif %}
+            <input type="hidden" name="CsrfToken" value="{{ csrf_token }}">
             <label for="UserEmail">Enter Email Address:<small>{{ userEmail_error }}</small></label>
             <input id="UserEmail" name="UserEmail" type="text" size="20" maxlength="300">
             <br>

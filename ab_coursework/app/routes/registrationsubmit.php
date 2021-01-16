@@ -2,18 +2,25 @@
 
 use ABCoursework\SessionManagerInterface;
 use ABCoursework\SessionWrapperInterface;
+use ABCoursework\Validator;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->post('/registrationsubmit', function (Request $request, Response $response) use ($app) {
 
+    $formName = 'registrationform.html.twig';
+
     $validator = $this->get('Validator');
+    $sessionWrapper = $this->get(SessionWrapperInterface::class);
+    $sessionManager = $this->get(SessionManagerInterface::class);
+
     $taintedParameters = $request->getParsedBody();
     $cleanedParameters = cleanupRegistrationParameters($validator, $taintedParameters);
-    $errors = getRegistrationValidationErrors($validator, $cleanedParameters);
+    $errors = getRegistrationValidationErrors($validator, $sessionWrapper, $formName, $cleanedParameters);
 
     if (empty($errors)) {
-        $cleanedParameters['cleanedSitePassword'] = hashPassword($app, $cleanedParameters['cleanedSitePassword']);
+        $bcryptWrapper = $this->get('BcryptWrapper');
+        $cleanedParameters['cleanedSitePassword'] = $bcryptWrapper->hash($cleanedParameters['cleanedSitePassword']);
         $cleanedParameters['cleanedPhoneNumber'] = (int)substr($cleanedParameters['cleanedPhoneNumber'], 1);
 
         $model = $this->get('UserModel');
@@ -35,7 +42,7 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
     }
 
     return $this->view->render($response,
-        'registrationform.html.twig',
+        $formName,
         [
             'css_path' => CSS_PATH,
             'landing_page' => LANDING_PAGE,
@@ -47,16 +54,18 @@ $app->post('/registrationsubmit', function (Request $request, Response $response
             'page_heading_2' => 'Registration Form',
             'page_text' => 'Please Create Your New User Info',
             'database_error' => $errors['Database'] ?? '',
+            'csrf_error' => $errors['CsrfToken'] ?? '',
             'userEmail_error' => $errors['UserEmail'] ?? '',
             'username_error' => $errors['SiteUsername'] ?? '',
             'password_error' => $errors['SitePassword'] ?? '',
             'confirmPassword_error' => $errors['ConfirmPassword'] ?? '',
-            'phoneNumber_error' => $errors['PhoneNumber'] ?? ''
+            'phoneNumber_error' => $errors['PhoneNumber'] ?? '',
+            'csrf_token' => $this->get(SessionWrapperInterface::class)->getCsrfToken($formName)
         ]);
 
 })->setName('registrationsubmit');
 
-function cleanupRegistrationParameters($validator, $taintedParameters): array
+function cleanupRegistrationParameters(Validator $validator, array $taintedParameters): array
 {
     $cleanedParameters = [];
 
@@ -64,6 +73,7 @@ function cleanupRegistrationParameters($validator, $taintedParameters): array
     $taintedUsername = $taintedParameters['SiteUsername'] ?? '';
     $taintedPhoneNumber = $taintedParameters['PhoneNumber'] ?? '';
 
+    $cleanedParameters['cleanedCsrfToken'] = $taintedParameters['CsrfToken'] ?? '';
     $cleanedParameters['cleanedUserEmail'] = $validator->validateEmail('UserEmail',$taintedEmail);
     $cleanedParameters['cleanedSiteUsername'] = $validator->ValidateString('SiteUsername', $taintedUsername, 1, 26);
     $cleanedParameters['cleanedSitePassword'] = $taintedParameters['SitePassword'] ?? '';
@@ -73,9 +83,17 @@ function cleanupRegistrationParameters($validator, $taintedParameters): array
     return $cleanedParameters;
 }
 
-function getRegistrationValidationErrors($validator, $cleanedParameters): array
+function getRegistrationValidationErrors(
+    Validator $validator,
+    SessionWrapperInterface $sessionWrapper,
+    string $formName,
+    array $cleanedParameters): array
 {
     $errors = [];
+
+    if (!$sessionWrapper->verifyCsrfToken($cleanedParameters['cleanedCsrfToken'], $formName)) {
+        $errors['CsrfToken'] = 'CSRF Error, please try again';
+    }
 
     if (empty($cleanedParameters['cleanedSitePassword'])) {
         $errors['SitePassword'] = 'This field is required!';
@@ -95,10 +113,4 @@ function getRegistrationValidationErrors($validator, $cleanedParameters): array
     }
 
     return $errors;
-}
-
-function hashPassword($app, $passwordForHashing): string
-{
-    $bcryptWrapper = $app->getContainer()->get('BcryptWrapper');
-    return $bcryptWrapper->hash($passwordForHashing);
 }

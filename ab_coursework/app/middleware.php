@@ -8,7 +8,10 @@
  * Date: 31/12/2020
  */
 
+use ABCoursework\SessionManagerInterface;
+use ABCoursework\SessionWrapperInterface;
 use \Psr\Http\Message\{ServerRequestInterface, ResponseInterface};
+use Slim\Exception\NotFoundException;
 
 /**
  * Checks if a user is logged in or not, if a not logged in user tries to access logged in pages, redirect to homepage.
@@ -22,7 +25,11 @@ $loggedInMiddleware = function (ServerRequestInterface $request, ResponseInterfa
 
     // Gets the route name that matches the requested URL.
     $route = $request->getAttribute('route');
-    $routeName = $route->getName();
+    if (empty($route)) {
+        throw new NotFoundException($request, $response);
+    } else {
+        $routeName = $route->getName();
+    }
 
     // Define routes people who aren't logged in can access and what logged in users can't.
     $notLoggedInRoutes = [
@@ -33,20 +40,16 @@ $loggedInMiddleware = function (ServerRequestInterface $request, ResponseInterfa
         'registrationsubmit'
     ];
 
-    $wrapper = $app->getContainer()->get(\ABCoursework\SessionWrapperInterface::class);
-    $manager = $app->getContainer()->get(\ABCoursework\SessionManagerInterface::class);
+    $wrapper = $app->getContainer()->get(SessionWrapperInterface::class);
+    $manager = $app->getContainer()->get(SessionManagerInterface::class);
 
-    // Start the session.
     $manager::start($wrapper);
 
     if (!$wrapper->check('username') && !in_array($routeName, $notLoggedInRoutes)) {
-        // If not logged and not private, redirect to homepage.
-        return $response->withRedirect('/ab_coursework_public/');
+        $response = $response->withRedirect('/ab_coursework_public/');
     } elseif ($wrapper->check('username') && in_array($routeName, $notLoggedInRoutes)) {
-        // Else if logged in and going to not logged in page go to menu.
-        return $response->withRedirect('/ab_coursework_public/menu');
+        $response = $response->withRedirect('/ab_coursework_public/menu');
     } else {
-        // Else carry on with request.
         $response = $next($request, $response);
     }
 

@@ -1,12 +1,15 @@
 <?php
 
+use ABCoursework\SessionWrapperInterface;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->get('/login', function (Request $request, Response $response) use ($app) {
 
+    $formName = 'loginform.html.twig';
+
     return $this->view->render($response,
-        'loginform.html.twig',
+        $formName,
         [
             'css_path' => CSS_PATH,
             'landing_page' => LANDING_PAGE,
@@ -16,7 +19,8 @@ $app->get('/login', function (Request $request, Response $response) use ($app) {
             'page_heading_2' => 'Login Form',
             'page_text' => 'Please Enter Your User Info',
             'action' => 'loginsubmit',
-            'method' => 'post'
+            'method' => 'post',
+            'csrf_token' => $this->get(SessionWrapperInterface::class)->getCsrfToken($formName)
         ]);
 
 })->setName('login');
