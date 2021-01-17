@@ -32,6 +32,7 @@ body {
     padding-top: 10px;
     padding-bottom: 10px;
     margin: auto;
+    margin-bottom: 2.5rem;
 }
 
 form + #inner-content-div {
@@ -95,6 +96,10 @@ table {
     white-space: nowrap;
 }
 
+table td {
+    border: 1px solid black;
+}
+
 @media only screen and (min-width: 345px) {
     #inner-content-div {
         width: -moz-fit-content;
@@ -114,4 +119,9 @@ table {
     .title, .subtitle {
         display: inline;
     }
+}
+
+.html5LogoText {
+    display: block;
+    margin-bottom: 10px;
 }

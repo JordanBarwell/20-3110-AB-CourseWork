@@ -2,7 +2,7 @@
 {% block content %}
     <h1>{{ page_heading_1 }}</h1>
     <div id="inner-content-div">
-        <p>Here are the latest messages:</p>
+        <p>Here are all the stored messages:</p>
         <br>
         {% if database_error is not empty %}
             <small>{{ database_error }}</small>
@@ -23,22 +23,22 @@
                 <th>Switch Four</th>
             </tr>
             {% for message in messages %}
-            <tr>
-                <td>{{ message.source }}</td>
-                <td>{{ message.received }}</td>
-                <td>{{ message.bearer }}</td>
-                <td>{{ message.ref }}</td>
-                <td>{{ message.temperature is not empty ? message.temperature : 'N/A' }}</td>
-                <td>{{ message.fan }}</td>
-                <td>{{ message.keypad is not empty ? message.keypad : 'N/A' }}</td>
-                <td>{{ message.switchOne }}</td>
-                <td>{{ message.switchTwo }}</td>
-                <td>{{ message.switchThree }}</td>
-                <td>{{ message.switchFour }}</td>
-            </tr>
+                <tr>
+                    <td>{{ message.source }}</td>
+                    <td>{{ message.received }}</td>
+                    <td>{{ message.bearer }}</td>
+                    <td>{{ message.ref }}</td>
+                    <td>{{ message.temperature is not empty ? message.temperature : 'N/A' }}</td>
+                    <td>{{ message.fan }}</td>
+                    <td>{{ message.keypad is not empty ? message.keypad : 'N/A' }}</td>
+                    <td>{{ message.switchOne }}</td>
+                    <td>{{ message.switchTwo }}</td>
+                    <td>{{ message.switchThree }}</td>
+                    <td>{{ message.switchFour }}</td>
+                </tr>
             {% endfor %}
         </table>
         <hr>
-        <a href="{{ path_for('menu') }}">Menu</a>
+        <a href="{{ path_for('adminmenu') }}">Menu</a>
     </div>
 {% endblock %}

@@ -21,6 +21,11 @@ class Base64WrapperTest extends TestCase
     static string $testDataEncoded;
 
     /**
+     * @var Base64Wrapper Base64Wrapper to test.
+     */
+    static Base64Wrapper $wrapper;
+
+    /**
      * Runs before all tests, initialising all necessary dependencies and retrieving settings values if needed.
      */
     public static function setUpBeforeClass(): void
@@ -28,6 +33,7 @@ class Base64WrapperTest extends TestCase
         // Set test data and expected encode result variables.
         self::$testData = 'Testing Testing 123';
         self::$testDataEncoded = base64_encode(self::$testData);
+        self::$wrapper = new Base64Wrapper();
     }
 
     /**
@@ -36,7 +42,7 @@ class Base64WrapperTest extends TestCase
      */
     public function testEncode()
     {
-        $encodedData = (new Base64Wrapper())->encode(self::$testData);
+        $encodedData = self::$wrapper->encode(self::$testData);
         $this->assertEquals(self::$testDataEncoded, $encodedData);
         return $encodedData;
     }
@@ -47,17 +53,18 @@ class Base64WrapperTest extends TestCase
      */
     public function testEmptyEncode()
     {
-        $encodedData = (new Base64Wrapper())->encode('');
+        $encodedData = self::$wrapper->encode('');
         $this->assertFalse($encodedData);
     }
 
     /**
      * Test decoding a base64 encoded string returns the original data.
      * @depends testEncode
+     * @param string $encodedData Base64 encoded data to be decoded.
      */
-    public function testDecode($encodedData)
+    public function testDecode(string $encodedData)
     {
-        $decodedData = (new Base64Wrapper())->decode($encodedData);
+        $decodedData = self::$wrapper->decode($encodedData);
         $this->assertEquals(self::$testData, $decodedData);
     }
 
@@ -67,7 +74,7 @@ class Base64WrapperTest extends TestCase
      */
     public function testEmptyDecode()
     {
-        $decodedData = (new Base64Wrapper())->decode('');
+        $decodedData = self::$wrapper->decode('');
         $this->assertFalse($decodedData);
     }
 
@@ -77,7 +84,7 @@ class Base64WrapperTest extends TestCase
      */
     public function testOutOfRangeDecode()
     {
-        $decodedData = (new Base64Wrapper())->decode('???');
+        $decodedData = self::$wrapper->decode('???');
         $this->assertFalse($decodedData);
     }
 

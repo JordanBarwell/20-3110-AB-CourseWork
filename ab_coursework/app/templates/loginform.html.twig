@@ -12,12 +12,12 @@
             <small>{{ csrf_error }}</small>
             <br>
         {% endif %}
-        <input type="hidden" name="CsrfToken" value="{{ csrf_token }}">
-        <label for="SiteUsername">Enter Username:<small>{{ username_error }}</small></label>
-        <input id="SiteUsername" name="SiteUsername" type="text" size="20" maxlength="30">
+        <input type="hidden" name="csrfToken" value="{{ csrf_token }}">
+        <label for="username">Username:<small>{{ username_error }}</small></label>
+        <input id="username" name="username" type="text" maxlength="26" required>
         <br>
-        <label for="SitePassword">Enter Password:<small>{{ password_error }}</small></label>
-        <input id="SitePassword" name="SitePassword" type="password" autocomplete="off" size="20" maxlength="100">
+        <label for="password">Password:<small>{{ password_error }}</small></label>
+        <input id="password" name="password" type="password" autocomplete="off" minlength="8" maxlength="100" required>
         <br>
         <input type="submit" value="Submit Details">
         <input type="reset" value="Clear Fields">

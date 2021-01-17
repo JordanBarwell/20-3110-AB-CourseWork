@@ -2,6 +2,8 @@
 
 namespace ABCoursework;
 
+use DateTime;
+
 /**
  * Validator: Validates strings, ints, emails, date times and phone numbers, as well as creating error messages.
  *
@@ -69,15 +71,15 @@ class Validator
             $sanitizedString = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
             $sanitizedStringLength = strlen($sanitizedString);
 
-            if (empty($value) && $minLength !== 0) {
+            if (strlen($value) === 0 && $minLength !== 0) {
                 $this->errors[$key] = 'This field is required!';
             } elseif ($sanitizedStringLength < $minLength || $sanitizedStringLength > $maxLength) {
-                $this->errors[$key] = "Must be between $minLength and $maxLength characters!";
+                $this->errors[$key] = "Must be between $minLength and $maxLength characters long!";
             } else {
                 $result = $sanitizedString;
             }
         } else {
-            $this->errors[$key] = "Must not be longer than $maxLength characters!";
+            $this->errors[$key] = "Must not be longer than $maxLength characters long!";
         }
 
         return $result;
@@ -95,7 +97,7 @@ class Validator
     {
         $result = false;
 
-        if (!empty($value) && strlen($value) <= 20) { // php ints have a max length of 20, because of the '-' sign.
+        if (strlen($value) !== 0 && strlen($value) <= 20) { // php ints have a max length of 20, because of the '-' sign.
             $sanitizedInt = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
             $validatedInt = filter_var($sanitizedInt, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]]);
 
@@ -116,7 +118,7 @@ class Validator
     /**
      * Tests if the entered string is a valid email address.
      * @param string $key Identifying key of the input value, used to store/retrieve errors.
-     * @param string $email Email string to be checked.
+     * @param string $value Email string to be checked.
      * @return bool|string Email address or false if it's invalid.
      */
     public function validateEmail(string $key, string $value)
@@ -153,8 +155,8 @@ class Validator
         $result = false;
 
         if (!empty($value) && strlen($value) <= 100) {
-            $date = \DateTime::createFromFormat($format, $value);
-            $valid = \DateTime::getLastErrors();
+            $date = DateTime::createFromFormat($format, $value);
+            $valid = DateTime::getLastErrors();
             if ($date !== false && $valid['warning_count'] == 0 && $valid['error_count'] == 0) {
                 $result = $value;
             } else {
@@ -189,6 +191,49 @@ class Validator
             }
         } else {
             $this->errors[$key] = 'This field is required!';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Tests a password string to see if it is between 8 and 100 characters long (inclusive).
+     * @param string $key Identifying key of the input value, used to store/retrieve errors.
+     * @param string $value Password string to be checked.
+     * @return false|string The password string or false if it's invalid.
+     */
+    public function validatePassword(string $key, string $value)
+    {
+        $result = false;
+
+        if (empty($value)) {
+            $this->errors[$key] = 'This field is required!';
+        } elseif (strlen($value) < 8 || strlen($value) > 100) {
+            $this->errors[$key] = 'Must be between 8 and 100 characters long!';
+        } else {
+            $result = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Tests a confirm password string to see if it matches the given password string.
+     * @param string $key Identifying key of the input value, used to store/retrieve errors.
+     * @param string $value Confirm password string to be checked.
+     * @param string $password The password string the confirm password string should equal.
+     * @return false|string The confirm password string or false if it's invalid.
+     */
+    public function validateConfirmPassword(string $key, string $value, string $password)
+    {
+        $result = false;
+
+        if (empty($value)) {
+            $this->errors[$key] = 'This field is required!';
+        } elseif ($value !== $password) {
+            $this->errors[$key] = 'Passwords must match!';
+        } else {
+            $result = $value;
         }
 
         return $result;

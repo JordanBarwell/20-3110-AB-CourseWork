@@ -22,3 +22,6 @@ require 'routes/viewmessage.php';
 require 'routes/logout.php';
 require 'routes/sendmessagesubmit.php';
 require 'routes/messagesent.php';
+require 'routes/adminmenu.php';
+require 'routes/viewallusers.php';
+require 'routes/viewallmessages.php';

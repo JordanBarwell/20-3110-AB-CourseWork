@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is for the registration route, from the homepage, a user can choose to register a new account to be stored,
+ * this route displays the registration form.
+ */
+
 use ABCoursework\SessionWrapperInterface;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -8,19 +13,17 @@ $app->get('/registration', function (Request $request, Response $response) use (
 
     $formName = 'registrationform.html.twig';
 
-    return $this->view->render($response,
-        $formName,
-        [
-            'css_path' => CSS_PATH,
-            'landing_page' => LANDING_PAGE,
-            'page_title' => APP_NAME,
-            'action' => 'registrationsubmit',
-            'method' => 'post',
-            'additional_info' => 'Created by Jared, Charlie and Jordan',
-            'page_heading_1' => 'Team AB Coursework',
-            'page_heading_2' => 'Registration Form',
-            'page_text' => 'Please Create Your New User Info',
-            'csrf_token' => $this->get(SessionWrapperInterface::class)->getCsrfToken($formName)
-        ]);
+    return $this->view->render($response, $formName, [
+        'css_path' => CSS_PATH,
+        'landing_page' => LANDING_PAGE,
+        'page_title' => APP_NAME,
+        'action' => 'registrationsubmit',
+        'method' => 'post',
+        'additional_info' => 'Created by Jared, Charlie and Jordan',
+        'page_heading_1' => 'Team AB Coursework',
+        'page_heading_2' => 'Registration Form',
+        'page_text' => 'Please Create Your New User Info',
+        'csrf_token' => $this->get(SessionWrapperInterface::class)->getCsrfToken($formName)
+    ]);
 
 })->setName('registration');

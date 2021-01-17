@@ -32,10 +32,24 @@ class XmlParser
     private array $tempAttributes = [];
 
     /**
-     * Creates a new XmlParser and sets the element and element data handlers to methods within this class.
+     * Frees the XmlParser memory once the class is no longer being used.
      */
-    public function __construct()
+    public function __destruct()
     {
+        if ($this->xmlParser !== null) {
+            xml_parser_free($this->xmlParser);
+        }
+    }
+
+    /**
+     * Creates a new XML parser object, freeing the old one if one exists, to clear the data ready for another
+     * XML string.
+     */
+    private function createXmlParser()
+    {
+        if ($this->xmlParser !== null) {
+            xml_parser_free($this->xmlParser);
+        }
         $this->xmlParser = xml_parser_create();
         xml_set_object($this->xmlParser, $this);
         xml_set_element_handler($this->xmlParser, "openElement", "closeElement");
@@ -43,21 +57,14 @@ class XmlParser
     }
 
     /**
-     * Frees the XmlParser memory once the class is no longer being used.
-     */
-    public function __destruct()
-    {
-        xml_parser_free($this->xmlParser);
-    }
-
-    /**
-     * Parses a given XML string into an array, keys being elements and attributes and the values being the element
-     * data or attribute value.
+     * Parses a given XML string into an array, escaping values for HTML display,
+     * keys being elements and attributes and the values being the escaped element data or attribute value.
      * @param string $xmlToParse XML String to parse.
      * @return array An associative array of the parsed XML data.
      */
     public function parseXml(string $xmlToParse): array
     {
+        $this->createXmlParser();
         $this->parsedData = [];
         $this->tempAttributes = [];
         xml_parse($this->xmlParser, $xmlToParse);
@@ -94,10 +101,10 @@ class XmlParser
     {
         if (array_key_exists($this->elementName, $this->parsedData) === false)
         {
-            $this->parsedData[$this->elementName] = $elementData;
+            $this->parsedData[$this->elementName] = htmlspecialchars(trim($elementData), ENT_COMPAT | ENT_HTML5);
             foreach ($this->tempAttributes as $tagAttrName => $tagAttrValue)
             {
-                $this->parsedData[$tagAttrName] = $tagAttrValue;
+                $this->parsedData[$tagAttrName] = htmlspecialchars(trim($tagAttrValue), ENT_COMPAT | ENT_HTML5);
             }
         }
     }

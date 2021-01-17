@@ -14,6 +14,7 @@ use ABCoursework\BcryptWrapper;
 use ABCoursework\DatabaseWrapper;
 use ABCoursework\FileSessionWrapper;
 use ABCoursework\LibSodiumWrapper;
+use ABCoursework\MessageModel;
 use ABCoursework\SessionManager;
 use ABCoursework\SessionManagerInterface;
 use ABCoursework\SessionWrapperInterface;
@@ -96,4 +97,14 @@ $container['SqlQueries'] = function ($container) {
 
 $container['UserModel'] = function ($container) {
     return new UserModel($container[LoggerInterface::class], $container['DatabaseWrapper'], $container['SqlQueries']);
+};
+
+$container['MessageModel'] = function ($container) {
+    return new MessageModel(
+        $container[LoggerInterface::class],
+        $container['SoapWrapper'],
+        $container['DatabaseWrapper'],
+        $container['SqlQueries'],
+        $container['settings']['soap']['login']
+    );
 };
