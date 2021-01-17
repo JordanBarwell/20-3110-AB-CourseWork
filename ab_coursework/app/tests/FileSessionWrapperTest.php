@@ -1,6 +1,8 @@
 <?php
 
+use ABCoursework\Base64Wrapper;
 use ABCoursework\FileSessionWrapper;
+use ABCoursework\LibSodiumWrapper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,7 +35,7 @@ class FileSessionWrapperTest extends TestCase
         // Set test key and value for session testing.
         self::$testKey = 'Testing';
         self::$testValue = 'Testing Testing 123';
-        $naWrapper = new \ABCoursework\LibSodiumWrapper((@require 'settings.php')['settings']['naKey'], new \ABCoursework\Base64Wrapper());
+        $naWrapper = new LibSodiumWrapper((@require 'settings.php')['settings']['naKey'], new Base64Wrapper());
         self::$wrapper = new FileSessionWrapper($naWrapper);
     }
 

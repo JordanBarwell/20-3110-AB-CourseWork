@@ -12,11 +12,24 @@ class ValidatorTest extends TestCase
 {
 
     /**
+     * @var Validator $validator Validator to test.
+     */
+    private static Validator $validator;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        self::$validator = new Validator();
+    }
+
+    /**
      * Tests string validation doesn't return false with a clean string.
      */
     public function testValidateStringCorrect()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertNotFalse($validator->validateString('test', $value));
     }
@@ -27,7 +40,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateStringEmpty()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '';
         $this->assertFalse($validator->validateString('test', $value));
         $this->assertEquals('This field is required!', $validator->getError('test'));
@@ -40,10 +53,10 @@ class ValidatorTest extends TestCase
      */
     public function testValidateStringLessThanMinLength()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validateString('test', $value, 5, 10));
-        $this->assertEquals('Must be between 5 and 10 characters!', $validator->getError('test'));
+        $this->assertEquals('Must be between 5 and 10 characters long!', $validator->getError('test'));
     }
 
     /**
@@ -53,10 +66,10 @@ class ValidatorTest extends TestCase
      */
     public function testValidateStringGreaterThanMaxLength()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validateString('test', $value, 1, 3));
-        $this->assertEquals('Must not be longer than 3 characters!', $validator->getError('test'));
+        $this->assertEquals('Must not be longer than 3 characters long!', $validator->getError('test'));
     }
 
     /**
@@ -64,7 +77,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntCorrect()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '1';
         $this->assertNotFalse($validator->validateInt('test', $value));
     }
@@ -75,7 +88,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntString()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validateInt('test', $value));
         $this->assertEquals('Must be a valid integer!', $validator->getError('test'));
@@ -87,7 +100,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntEmpty()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '';
         $this->assertFalse($validator->validateInt('test', $value));
         $this->assertEquals('This field is required!', $validator->getError('test'));
@@ -100,7 +113,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntTooLong()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '111111111111111111111111111111111';
         $this->assertFalse($validator->validateInt('test', $value));
         $this->assertEquals('Must be between '.PHP_INT_MIN.' and '.PHP_INT_MAX.'! (Inclusive)', $validator->getError('test'));
@@ -113,7 +126,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntLessThanMin()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '25';
         $this->assertFalse($validator->validateInt('test', $value, 30));
         $this->assertEquals('Must be between 30 and '.PHP_INT_MAX.'! (Inclusive)', $validator->getError('test'));
@@ -126,7 +139,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateIntGreaterThanMax()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '25';
         $this->assertFalse($validator->validateInt('test', $value, PHP_INT_MIN, 10));
         $this->assertEquals('Must be between '.PHP_INT_MIN.' and 10! (Inclusive)', $validator->getError('test'));
@@ -137,7 +150,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateEmailCorrect()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'a@a.com';
         $this->assertNotFalse($validator->validateEmail('test', $value));
     }
@@ -148,7 +161,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateEmailString()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validateEmail('test', $value));
         $this->assertEquals('Must be a valid e-mail address!', $validator->getError('test'));
@@ -160,7 +173,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateEmailEmpty()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '';
         $this->assertFalse($validator->validateEmail('test', $value));
         $this->assertEquals('This field is required!', $validator->getError('test'));
@@ -172,7 +185,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateEmailTooLong()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = str_repeat('a', 301);
         $this->assertFalse($validator->validateEmail('test', $value));
         $this->assertEquals('Must be a valid e-mail address!', $validator->getError('test'));
@@ -183,7 +196,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateDateTimeCorrect()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '01/02/2010 21:22:23';
         $this->assertNotFalse($validator->validateDateTime('test', $value));
     }
@@ -194,7 +207,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateDateTimeString()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validateDateTime('test', $value));
         $this->assertEquals('Must be a valid datetime!', $validator->getError('test'));
@@ -206,7 +219,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateDateTimeEmpty()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '';
         $this->assertFalse($validator->validateDateTime('test', $value));
         $this->assertEquals('This field is required!', $validator->getError('test'));
@@ -218,7 +231,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidateDateTimeTooLong()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = str_repeat('a', 101);
         $this->assertFalse($validator->validateDateTime('test', $value));
         $this->assertEquals('Must be a valid datetime!', $validator->getError('test'));
@@ -229,7 +242,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidatePhoneNumberCorrect()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '+447478954721';
         $this->assertNotFalse($validator->validatePhoneNumber('test', $value));
     }
@@ -240,7 +253,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidatePhoneNumberString()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = 'ABCD';
         $this->assertFalse($validator->validatePhoneNumber('test', $value));
         $this->assertEquals('Must be a valid phone number!', $validator->getError('test'));
@@ -252,7 +265,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidatePhoneNumberEmpty()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '';
         $this->assertFalse($validator->validatePhoneNumber('test', $value));
         $this->assertEquals('This field is required!', $validator->getError('test'));
@@ -264,7 +277,7 @@ class ValidatorTest extends TestCase
      */
     public function testValidatePhoneNumberTooLong()
     {
-        $validator = new ABCoursework\Validator();
+        $validator = self::$validator;
         $value = '+44444444444444444444444444';
         $this->assertFalse($validator->validatePhoneNumber('test', $value));
         $this->assertEquals('Must be a valid phone number!', $validator->getError('test'));

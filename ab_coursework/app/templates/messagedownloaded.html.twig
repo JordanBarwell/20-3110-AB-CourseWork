@@ -2,7 +2,16 @@
 {% block content %}
     <h1>{{ page_heading_1 }}</h1>
     <div id="inner-content-div">
-        <p>Message has been Downloaded!</p>
+        {% if soap_error is not empty %}
+            <small>{{ soap_error }}</small>
+            <br>
+        {% endif %}
+        {% if database_error is not empty %}
+            <small>{{ database_error }}</small>
+            <br>
+        {% endif %}
+        <p>{{ total_message_count }} new message(s) have been downloaded!</p>
+        <p>Out of those, {{ app_message_count }} message(s) are for our system!</p>
         <hr>
         <a href="{{ path_for('menu') }}">Menu</a>
     </div>

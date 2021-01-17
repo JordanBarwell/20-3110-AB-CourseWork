@@ -1,5 +1,6 @@
 <?php
 
+use ABCoursework\Base64Wrapper;
 use ABCoursework\LibSodiumWrapper;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +45,7 @@ class LibSodiumWrapperTest extends TestCase
      */
     public function testConstructor()
     {
-        $wrapper = new LibSodiumWrapper(self::$key, new \ABCoursework\Base64Wrapper());
+        $wrapper = new LibSodiumWrapper(self::$key, new Base64Wrapper());
         $this->assertInstanceOf(LibSodiumWrapper::class, $wrapper);
         return $wrapper;
     }
@@ -57,12 +58,13 @@ class LibSodiumWrapperTest extends TestCase
     public function testConstructorException()
     {
         $this->expectException(Exception::class);
-        $badWrapper = new LibSodiumWrapper('Key too short!', new \ABCoursework\Base64Wrapper());
+        new LibSodiumWrapper('Key too short!', new Base64Wrapper());
     }
 
     /**
      * Tests that the length of the wrapper encrypted string is the same as the library encrypted string.
      * @depends testConstructor
+     * @param LibSodiumWrapper $wrapper Wrapper to perform testing with.
      */
     public function testEncryption(LibSodiumWrapper $wrapper)
     {
@@ -81,6 +83,7 @@ class LibSodiumWrapperTest extends TestCase
      * Tests that the encryption function returns false if an empty value is entered.
      * @depends testConstructor
      * @depends testEncryption
+     * @param LibSodiumWrapper $wrapper Wrapper to perform testing with.
      */
     public function testEncryptionEmptyString(LibSodiumWrapper $wrapper)
     {
@@ -91,6 +94,7 @@ class LibSodiumWrapperTest extends TestCase
      * Tests that the decryption function returns the original value when an encrypted value is passed to it.
      * @depends testConstructor
      * @depends testEncryption
+     * @param LibSodiumWrapper $wrapper Wrapper to perform testing with.
      */
     public function testDecryption(LibSodiumWrapper $wrapper)
     {
@@ -102,6 +106,7 @@ class LibSodiumWrapperTest extends TestCase
      * Tests that the decryption function returns false if an empty value is entered.
      * @depends testConstructor
      * @depends testDecryption
+     * @param LibSodiumWrapper $wrapper Wrapper to perform testing with.
      */
     public function testDecryptionEmptyString(LibSodiumWrapper $wrapper)
     {

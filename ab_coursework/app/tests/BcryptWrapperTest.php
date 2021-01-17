@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
  */
 class BcryptWrapperTest extends TestCase
 {
-    /**
-     * @var array BCrypt algorithm options.
-     */
-    static array $options;
 
     /**
      * @var string Password to be hashed and compared to expected hash.
@@ -26,13 +22,19 @@ class BcryptWrapperTest extends TestCase
     static $testPasswordHash;
 
     /**
+     * @var BcryptWrapper BcryptWrapper to test.
+     */
+    static BcryptWrapper $wrapper;
+
+    /**
      * Runs before all tests, initialising all necessary dependencies and retrieving settings values if needed.
      */
     public static function setUpBeforeClass(): void
     {
-        self::$options = (require 'settings.php')['settings']['bcrypt'];
+        $options = (require 'settings.php')['settings']['bcrypt'];
         self::$testPassword = 'Testing Testing 123';
-        self::$testPasswordHash = password_hash(self::$testPassword, PASSWORD_BCRYPT, self::$options);
+        self::$testPasswordHash = password_hash(self::$testPassword, PASSWORD_BCRYPT, $options);
+        self::$wrapper = new BcryptWrapper($options);
     }
 
     /**
@@ -41,7 +43,7 @@ class BcryptWrapperTest extends TestCase
      */
     public function testHash()
     {
-        $wrapper = new BcryptWrapper(self::$options);
+        $wrapper = self::$wrapper;
         $hash = $wrapper->hash(self::$testPassword);
         $this->assertTrue(password_verify(self::$testPassword, $hash));
         return $wrapper;
@@ -50,6 +52,7 @@ class BcryptWrapperTest extends TestCase
     /**
      * Test hash function returns false if empty password string given.
      * @depends testHash
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testHashEmpty(BcryptWrapper $wrapper)
     {
@@ -59,6 +62,7 @@ class BcryptWrapperTest extends TestCase
     /**
      * Test verification function returns true with known matching password and hash.
      * @depends testHash
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testVerify(BcryptWrapper $wrapper)
     {
@@ -69,6 +73,7 @@ class BcryptWrapperTest extends TestCase
      * Test verification function returns false with known non-matching password and hash.
      * @depends testHash
      * @depends testVerify
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testVerifyWrongPassword(BcryptWrapper $wrapper)
     {
@@ -79,6 +84,7 @@ class BcryptWrapperTest extends TestCase
      * Test verification function returns false when given empty password.
      * @depends testHash
      * @depends testVerify
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testVerifyEmptyPassword(BcryptWrapper $wrapper)
     {
@@ -89,6 +95,7 @@ class BcryptWrapperTest extends TestCase
      * Test verification function returns false when given empty hash.
      * @depends testHash
      * @depends testVerify
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testVerifyEmptyHash(BcryptWrapper $wrapper)
     {
@@ -99,6 +106,7 @@ class BcryptWrapperTest extends TestCase
      * Test verification function returns false when given empty password and hash.
      * @depends testHash
      * @depends testVerify
+     * @param BcryptWrapper $wrapper Wrapper to perform testing with.
      */
     public function testVerifyBothEmpty(BcryptWrapper $wrapper)
     {

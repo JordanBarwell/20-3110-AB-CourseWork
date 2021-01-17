@@ -9,6 +9,10 @@
         <a href="{{ path_for('downloadmessage') }}">Download Message</a>
         <p>View latest messages</p>
         <a href="{{ path_for('viewmessages') }}">View Messages</a>
+        {% if admin %}
+            <p>View Admin Menu</p>
+            <a href="{{ path_for('adminmenu') }}">Admin Menu</a>
+        {% endif %}
         <p>Logout below</p>
         <a href="{{ path_for('logout') }}">Logout</a>
     </div>

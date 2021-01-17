@@ -1,0 +1,30 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <h1>{{ page_heading_1 }}</h1>
+    <div id="inner-content-div">
+        <p>Here are all the registered users:</p>
+        <br>
+        {% if database_error is not empty %}
+            <small>{{ database_error }}</small>
+            <br>
+        {% endif %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+            </tr>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <hr>
+        <a href="{{ path_for('adminmenu') }}">Admin Menu</a>
+    </div>
+{% endblock %}

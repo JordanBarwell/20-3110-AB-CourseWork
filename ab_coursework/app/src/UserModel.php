@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 /**
  * UserModel: Class for getting information from the Database related to Users and logging in/logging out the User.
  * @package ABCoursework
+ * @author Team AB (Jared)
  */
 class UserModel
 {
@@ -58,13 +59,13 @@ class UserModel
      * @param array $params Cleaned Parameters to query the database to check if the details exist.
      * @return bool Whether or not the user details already exist.
      */
-    public function checkUserExists(array $params)
+    public function checkExists(array $params)
     {
         $result = false;
 
-        $username = $params['cleanedSiteUsername'];
-        $email = $params['cleanedUserEmail'];
-        $phoneNumber = $params['cleanedPhoneNumber'];
+        $username = $params['username'];
+        $email = $params['email'];
+        $phoneNumber = $params['phoneNumber'];
 
         $query = $this->queries->checkUserDetails($username, $email, $phoneNumber);
         if ($query) {
@@ -72,19 +73,18 @@ class UserModel
             $queryResult = $this->dbWrapper->executeAndFetch($query);
             if ($queryResult) {
                 $result = true;
-
                 if ($queryResult['username'] === $username) {
-                    $this->errors['SiteUsername'] = 'Username Already Exists!';
+                    $this->errors['username'] = 'Username Already Exists!';
                 }
                 if ($queryResult['email'] === $email) {
-                    $this->errors['UserEmail'] = 'Email Already In Use!';
+                    $this->errors['email'] = 'Email Already In Use!';
                 }
                 if ((int)$queryResult['phone'] === $phoneNumber) {
-                    $this->errors['PhoneNumber'] = 'Phone Number Already In Use!';
+                    $this->errors['phoneNumber'] = 'Phone Number Already In Use!';
                 }
             }
         } else {
-            $this->errors['Database'] = 'Database connection couldn\'t be established, please try again later!';
+            $this->errors['database'] = 'Database connection couldn\'t be established, please try again later!';
         }
 
         return $result;
@@ -98,14 +98,14 @@ class UserModel
      * @param SessionManagerInterface $manager Session Manager used to regenerate session on successful registration.
      * @return bool Whether user registration was successful.
      */
-    public function registerUser(array $params, SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
+    public function register(array $params, SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
     {
         $result = false;
 
-        $username = $params['cleanedSiteUsername'];
-        $passwordHash = $params['cleanedSitePassword'];
-        $email = $params['cleanedUserEmail'];
-        $phoneNumber = $params['cleanedPhoneNumber'];
+        $username = $params['username'];
+        $passwordHash = $params['password'];
+        $email = $params['email'];
+        $phoneNumber = $params['phoneNumber'];
 
         $query = $this->queries->insertUser($username, $passwordHash, $email, $phoneNumber);
 
@@ -115,7 +115,7 @@ class UserModel
             $manager::regenerate($wrapper);
             $this->logger->info('New User Registered', ['username' => $username]);
         } else {
-            $this->errors['Database'] = 'Database connection couldn\'t be established, please try again later!';
+            $this->errors['database'] = 'Database connection couldn\'t be established, please try again later!';
         }
 
         return $result;
@@ -130,15 +130,15 @@ class UserModel
     {
         $result = [];
 
-        $query = $this->queries->getUserLoginData($username);
+        $this->logger->info('Database Login Details Requested', ['username' => $username]);
 
+        $query = $this->queries->getUserLoginData($username);
         if ($query)
         {
             $queryResult = $this->dbWrapper->executeAndFetch($query);
             $result = $queryResult ?? [];
-            $this->logger->info('Login Details Requested', ['username' => $username]);
         } else {
-            $this->errors['Database'] = 'Database connection couldn\'t be established, please try again later!';
+            $this->errors['database'] = 'Database connection couldn\'t be established, please try again later!';
         }
 
         return $result;
@@ -151,7 +151,7 @@ class UserModel
      * @param SessionManagerInterface $manager Session Manager used to regenerate session id using the wrapper.
      * @return bool Whether or not the login was successful.
      */
-    public function loginUser(string $username, SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
+    public function login(string $username, SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
     {
         $result = $wrapper->set('username', $username);
         if ($result) {
@@ -166,10 +166,57 @@ class UserModel
      * @param SessionWrapperInterface $wrapper Session Wrapper used by manager to destroy the session.
      * @param SessionManagerInterface $manager Session Manager used to destroy the session.
      */
-    public function logoutUser(SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
+    public function logout(SessionWrapperInterface $wrapper, SessionManagerInterface $manager)
     {
         $this->logger->info('User Logged Out', ['username' => $wrapper->get('username')]);
         $manager::destroy($wrapper);
+    }
+
+    /**
+     * Retrieves a user's phone number from the database.
+     * @param string $username The user's name the phone number is associated with.
+     * @return mixed|string Phone number from the database or empty string on failure.
+     */
+    public function getPhoneNumber(string $username)
+    {
+        $result = '';
+
+        $this->logger->info('Database Phone Number Requested', ['username' => $username]);
+
+        $query = $this->queries->getUserPhoneNumber($username);
+        if ($query) {
+            $queryResult = $this->dbWrapper->executeAndFetch($query);
+            if ($queryResult) {
+                $result = $queryResult['phone'];
+            }
+        } else {
+            $this->errors['database'] = 'Database connection couldn\'t be established, please try again later!';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves all users from the database.
+     * @return array All users from the database or an empty array on failure.
+     */
+    public function getAllUsers()
+    {
+        $result = [];
+
+        $this->logger->info('All User Data Requested', ['username' => 'admin']);
+
+        $query = $this->queries->getAllUsers();
+        if ($query) {
+            $queryResult = $this->dbWrapper->executeAndFetchAll($query);
+            if ($queryResult) {
+                $result = $queryResult;
+            }
+        } else {
+            $this->errors['database'] = 'Database connection couldn\'t be established, please try again later!';
+        }
+
+        return $result;
     }
 
 }

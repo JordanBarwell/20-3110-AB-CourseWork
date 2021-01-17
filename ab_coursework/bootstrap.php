@@ -14,7 +14,7 @@ require 'vendor/autoload.php';
 
 $settings = require __DIR__ . '/app/settings.php';
 
-$makeTrace = false;
+$makeTrace = true;
 
 if ($makeTrace && function_exists('xdebug_start_trace'))
 {

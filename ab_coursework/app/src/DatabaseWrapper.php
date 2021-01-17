@@ -177,7 +177,7 @@ class DatabaseWrapper
     public function executeAndFetchAll(?QueryBuilder $queryBuilder)
     {
         $executionResult = $this->execute($queryBuilder);
-        return $this->fetch($executionResult);
+        return $this->fetchAll($executionResult);
     }
 
     /**

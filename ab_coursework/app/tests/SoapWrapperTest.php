@@ -1,6 +1,7 @@
 <?php
 
 use ABCoursework\SoapWrapper;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -32,11 +33,11 @@ class SoapWrapperTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         // Logger setup
-        self::$logger = new Monolog\Logger('logger');
+        self::$logger = new Logger('logger');
         $logFile = '../../../logs/ABCourseworkTest.log';
 
         // Create Log Formatting and Handler
-        $fileHandler = new Monolog\Handler\StreamHandler($logFile, \Monolog\Logger::DEBUG);
+        $fileHandler = new Monolog\Handler\StreamHandler($logFile, Logger::DEBUG);
         $dateFormat = 'd/m/Y H:i:s';
         $output = "%datetime% | %level_name% | %message% | %context% | %extra%\n";
         $formatter = new Monolog\Formatter\LineFormatter($output, $dateFormat, false, true);
@@ -73,6 +74,7 @@ class SoapWrapperTest extends TestCase
     /**
      * Test for newSoapConnection using verified connection info, will return true if new connection has been established.
      * @depends testCorrectCreation
+     * @param SoapWrapper $wrapper Wrapper to perform testing with.
      */
     public function testNewConnection(SoapWrapper $wrapper)
     {
@@ -83,6 +85,7 @@ class SoapWrapperTest extends TestCase
      * Test for newSoapConnection using incorrect connection info, will return false as new connection couldn't be established.
      * @depends testCorrectCreation
      * @depends testNewConnection
+     * @param SoapWrapper $wrapper Wrapper to perform testing with.
      */
     public function testIncorrectNewConnection(SoapWrapper $wrapper)
     {
@@ -92,6 +95,7 @@ class SoapWrapperTest extends TestCase
     /**
      * Test for performSoapFunction, using peekMessages.
      * @depends testCorrectCreation
+     * @param SoapWrapper $wrapper Wrapper to perform testing with.
      */
     public function testSoapFunctionCall(SoapWrapper $wrapper)
     {
@@ -111,6 +115,7 @@ class SoapWrapperTest extends TestCase
      * Test for performSoapFunction, using peekMessages.
      * @depends testCorrectCreation
      * @depends testSoapFunctionCall
+     * @param SoapWrapper $wrapper Wrapper to perform testing with.
      */
     public function testIncorrectSoapFunctionCall(SoapWrapper $wrapper)
     {

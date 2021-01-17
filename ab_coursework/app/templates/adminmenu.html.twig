@@ -1,0 +1,15 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <h1>{{ page_heading_1 }}</h1>
+    <h2>Please select one of the following options</h2>
+    <div id="inner-content-div">
+        <p>View All Users</p>
+        <a href="{{ path_for('viewallusers') }}">View Users</a>
+        <p>View All Messages</p>
+        <a href="{{ path_for('viewallmessages') }}">View Messages</a>
+        <p>View latest messages</p>
+        <a href="{{ path_for('menu') }}">Main Menu</a>
+        <p>Logout below</p>
+        <a href="{{ path_for('logout') }}">Logout</a>
+    </div>
+{% endblock %}

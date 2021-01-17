@@ -27,6 +27,14 @@ class SqlQueries
         $this->queryBuilder = $queryBuilder;
     }
 
+    /**
+     * Builds a query to retrieve user information from the database that matches user input to check a user isn't already
+     * registered.
+     * @param string $username Cleaned input username to check if it already exists in the database.
+     * @param string $email Cleaned input email address to check if it already exists in the database.
+     * @param string $phoneNumber Cleaned input phone number to check if it already exists in the database.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
     public function checkUserDetails(string $username, string $email, string $phoneNumber)
     {
         $result = null;
@@ -47,32 +55,47 @@ class SqlQueries
         return $result;
     }
 
+    /**
+     * Builds a query to insert a new user into the database.
+     * @param string $username Username of new user to be inserted.
+     * @param string $passwordHash Password hash of the new user to be inserted.
+     * @param string $email Email address of the new user to be inserted.
+     * @param int $phoneNumber Phone number of the new user to be inserted.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
     public function insertUser(string $username, string $passwordHash, string $email, int $phoneNumber)
     {
         $result = null;
 
-        $result = $this->queryBuilder->insert('users')
-            ->values([
-                'username' => ':username',
-                'password' => ':password',
-                'email' => ':email',
-                'phone' => ':phone'
-            ])->setParameters([
-                'username' => $username,
-                'password' => $passwordHash,
-                'email' => $email,
-                'phone' => $phoneNumber
-            ]);
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->insert('users')
+                ->values([
+                    'username' => ':username',
+                    'password' => ':password',
+                    'email' => ':email',
+                    'phone' => ':phone'
+                ])->setParameters([
+                    'username' => $username,
+                    'password' => $passwordHash,
+                    'email' => $email,
+                    'phone' => $phoneNumber
+                ]);
+        }
 
         return $result;
     }
 
+    /**
+     * Builds a query to retrieve existing user login data from the database.
+     * @param string $username Username used in the query to identify user details.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
     public function getUserLoginData(string $username)
     {
         $result = null;
 
         if ($this->queryBuilder !== null) {
-            $result = $this->queryBuilder->select('id', 'username', 'password')
+            $result = $this->queryBuilder->select('username', 'password')
                 ->from('users')
                 ->where('username = :username')
                 ->setParameter('username', $username);
@@ -81,41 +104,160 @@ class SqlQueries
         return $result;
     }
 
-    public function insertMessage($parameters)
+    /**
+     * Builds a query to retrieve a user's phone number from the database.
+     * @param string $username Username of the user whose phoone number is required.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function getUserPhoneNumber(string $username)
     {
-        $queryBuilder = $this->queryBuilder->insert('messages')
-            ->values([
-                'source' => ':source',
-                'destination' => ':destination',
-                'received' => ':received',
-                'bearer' => ':bearer',
-                'ref' => ':ref',
-                'message' => ':message'
-            ])->setParameters([
-                ':source' => $parameters['source'],
-                ':destination' => $parameters['destination'],
-                ':received' => $parameters['received'],
-                ':bearer' => $parameters['bearer'],
-                ':ref' => $parameters['ref'],
-                ':message' => $parameters['message']
-            ]);
+        $result = null;
 
-        $storeResult = $queryBuilder->execute();
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select('phone')
+                ->from('users')
+                ->where('username = :username')
+                ->setParameter('username', $username);
+        }
 
-        return $storeResult;
+        return $result;
     }
 
-    public function viewMessages(int $numberOfMsg)
+    /**
+     * Builds a query to insert a message into the database.
+     * @param array $parameters Cleaned message details to be inserted into the database.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function insertMessage(array $parameters)
     {
-        $result = '';
+        $result = null;
 
-        $queryBuilder = $this->queryBuilder->select('source',
-            'destination', 'received', 'bearer', 'ref', 'message')
-            ->from('messages')
-            ->orderBy('received', 'DESC')
-            ->setMaxResults($numberOfMsg);
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->insert('messages')
+                ->values([
+                    'source' => ':source',
+                    'received' => ':received',
+                    'bearer' => ':bearer',
+                    'ref' => ':ref',
+                    'temperature' => ':temperature',
+                    'fan' => ':fan',
+                    'keypad' => ':keypad',
+                    'switchOne' => ':switchOne',
+                    'switchTwo' => ':switchTwo',
+                    'switchThree' => ':switchThree',
+                    'switchFour' => ':switchFour'
+                ])->setParameters([
+                    'source' => $parameters['source'],
+                    'received' => $parameters['received'],
+                    'bearer' => $parameters['bearer'],
+                    'ref' => $parameters['ref'],
+                    'temperature' => $parameters['temperature'],
+                    'fan' => $parameters['fan'],
+                    'keypad' => $parameters['keypad'],
+                    'switchOne' => $parameters['switchOne'],
+                    'switchTwo' => $parameters['switchTwo'],
+                    'switchThree' => $parameters['switchThree'],
+                    'switchFour' => $parameters['switchFour']
+                ]);
+        }
 
-        $result = $queryBuilder->execute()->fetchAllAssociative();
+        return $result;
+    }
+
+    /**
+     * Builds a query to retrieve a number of messages from the database.
+     * @param int $numberOfMessages Number of messages to be retrieved.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function getMessages(int $numberOfMessages)
+    {
+        $result = null;
+
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select(
+                'source',
+                'received',
+                'bearer',
+                'ref',
+                'temperature',
+                'fan',
+                'keypad',
+                'switchOne',
+                'switchTwo',
+                'switchThree',
+                'switchFour'
+            )->from('messages')
+                ->orderBy('received', 'DESC')
+                ->setMaxResults($numberOfMessages);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Builds a query to retrieve the latest received datetime from the database.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function getLatestMessageDateTime()
+    {
+        $result = null;
+
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select('received')
+                ->from('messages')
+                ->orderBy('received', 'DESC')
+                ->setMaxResults(1);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Builds a query to retrieve all messages from the database.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function getAllMessages()
+    {
+        $result = null;
+
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select(
+                'source',
+                'received',
+                'bearer',
+                'ref',
+                'temperature',
+                'fan',
+                'keypad',
+                'switchOne',
+                'switchTwo',
+                'switchThree',
+                'switchFour'
+            )->from('messages')
+                ->orderBy('received', 'DESC');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Builds a query to retrieve all users from the database.
+     * @return QueryBuilder|null Built Query or null on database connection failure.
+     */
+    public function getAllUsers()
+    {
+        $result = null;
+
+        if ($this->queryBuilder !== null) {
+            $result = $this->queryBuilder->select(
+                'id',
+                'username',
+                'email',
+                'phone'
+            )->from('users')
+                ->orderBy('id');
+        }
+
         return $result;
     }
 

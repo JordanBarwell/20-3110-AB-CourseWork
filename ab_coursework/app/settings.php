@@ -27,10 +27,6 @@ define('CSS_PATH', $cssPath);
 define('APP_NAME', 'AB Coursework');
 define('LANDING_PAGE', $urlRoot);
 
-//define ('LIB_CHART_OUTPUT_PATH', 'media/charts/');
-//define ('LIB_CHART_FILE_PATH', $scriptPath);
-//define ('LIB_CHART_CLASS_PATH', 'libchart/classes/');
-
 $settings = [
     'settings' => [
         'displayErrorDetails' => true,
